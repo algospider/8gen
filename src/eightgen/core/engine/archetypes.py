@@ -21,19 +21,29 @@ def build_space_shooter_game(title: str = "Neon Space Defender") -> str:
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
+      user-select: none;
     }}
     #game-wrapper {{
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      border: 1px solid #1f293d;
     }}
     canvas {{
       display: block;
-      background: #050811;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      cursor: pointer;
     }}
     .hud {{
       position: absolute;
@@ -103,6 +113,10 @@ def build_space_shooter_game(title: str = "Neon Space Defender") -> str:
   let wave = 1;
   let lastShot = 0;
   let fireRate = 160;
+
+  window.addEventListener('click', () => {{
+    if (state === 'MENU' || state === 'GAMEOVER') resetGame();
+  }});
 
   // Starfield
   const stars = Array.from({{ length: 80 }}, () => ({{
@@ -349,15 +363,24 @@ def build_space_shooter_game(title: str = "Neon Space Defender") -> str:
       ctx.textAlign = 'center';
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 44px -apple-system, sans-serif';
-      ctx.fillText('{title}', 400, 240);
+      ctx.fillText('{title}', 400, 230);
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '16px -apple-system, sans-serif';
-      ctx.fillText('CONTROLS: Arrow Keys / WASD to move • Space to Fire • Or Touch/Mouse Drag', 400, 300);
+      ctx.fillText('CONTROLS: Arrow Keys / WASD to move • Space to Fire • Or Drag Mouse/Finger', 400, 290);
 
-      ctx.fillStyle = '#f59e0b';
+      // Pulsing Start Button Box
+      const pulse = Math.sin(Date.now() * 0.007) * 0.15 + 0.85;
+      ctx.fillStyle = '#10b981';
+      ctx.globalAlpha = pulse;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(250, 350, 300, 54, 12);
+      else ctx.rect(250, 350, 300, 54);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px -apple-system, sans-serif';
-      ctx.fillText('PRESS SPACE OR CLICK TO START', 400, 380);
+      ctx.fillText('▶ CLICK TO PLAY', 400, 384);
 
       if (Input.isAction()) resetGame();
     }} else if (state === 'PLAYING') {{
@@ -490,17 +513,30 @@ def build_brick_breaker_game(title: str = "Neon Brick Breaker") -> str:
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
+      user-select: none;
     }}
     #game-wrapper {{
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      border: 1px solid #1e293b;
     }}
-    canvas {{ display: block; background: #030712; }}
+    canvas {{
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      cursor: pointer;
+    }}
     .hud {{
       position: absolute;
       top: 14px;
@@ -540,6 +576,10 @@ def build_brick_breaker_game(title: str = "Neon Brick Breaker") -> str:
   let state = 'MENU';
   let score = 0;
   let lives = 3;
+
+  window.addEventListener('click', () => {{
+    if (state === 'MENU' || state === 'GAMEOVER' || state === 'VICTORY') resetGame();
+  }});
 
   const paddle = {{
     x: 350,
@@ -687,15 +727,23 @@ def build_brick_breaker_game(title: str = "Neon Brick Breaker") -> str:
       ctx.textAlign = 'center';
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 44px -apple-system, sans-serif';
-      ctx.fillText('{title}', 400, 260);
+      ctx.fillText('{title}', 400, 240);
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '16px -apple-system, sans-serif';
-      ctx.fillText('Use Left/Right Arrow Keys, A/D, or Drag with Mouse', 400, 310);
+      ctx.fillText('Move: Left/Right Arrow Keys, A/D, or Drag with Mouse', 400, 290);
 
-      ctx.fillStyle = '#f59e0b';
+      const pulse = Math.sin(Date.now() * 0.007) * 0.15 + 0.85;
+      ctx.fillStyle = '#10b981';
+      ctx.globalAlpha = pulse;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(250, 350, 300, 54, 12);
+      else ctx.rect(250, 350, 300, 54);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px -apple-system, sans-serif';
-      ctx.fillText('PRESS SPACE OR CLICK TO START', 400, 380);
+      ctx.fillText('▶ CLICK TO PLAY', 400, 384);
 
       if (Input.isAction()) resetGame();
     }} else if (state === 'PLAYING') {{
@@ -784,17 +832,30 @@ def build_cyber_snake_game(title: str = "Cyber Snake 2099") -> str:
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
+      user-select: none;
     }}
     #game-wrapper {{
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      border: 1px solid #1f293d;
     }}
-    canvas {{ display: block; background: #040711; }}
+    canvas {{
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      cursor: pointer;
+    }}
     .hud {{
       position: absolute;
       top: 14px;
@@ -839,6 +900,10 @@ def build_cyber_snake_game(title: str = "Cyber Snake 2099") -> str:
   let score = 0;
   let highScore = parseInt(localStorage.getItem('8gen_hs_snake') || '0', 10);
   highEl.innerText = highScore;
+
+  window.addEventListener('click', () => {{
+    if (state === 'MENU' || state === 'GAMEOVER') resetGame();
+  }});
 
   let snake = [];
   let dir = {{ x: 1, y: 0 }};
@@ -969,15 +1034,23 @@ def build_cyber_snake_game(title: str = "Cyber Snake 2099") -> str:
       ctx.textAlign = 'center';
       ctx.fillStyle = '#10b981';
       ctx.font = 'bold 44px -apple-system, sans-serif';
-      ctx.fillText('{title}', 400, 260);
+      ctx.fillText('{title}', 400, 240);
 
       ctx.fillStyle = '#94a3b8';
       ctx.font = '16px -apple-system, sans-serif';
-      ctx.fillText('CONTROLS: Arrow Keys / WASD to navigate', 400, 310);
+      ctx.fillText('CONTROLS: Arrow Keys / WASD to navigate', 400, 290);
 
-      ctx.fillStyle = '#f59e0b';
+      const pulse = Math.sin(Date.now() * 0.007) * 0.15 + 0.85;
+      ctx.fillStyle = '#10b981';
+      ctx.globalAlpha = pulse;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(250, 350, 300, 54, 12);
+      else ctx.rect(250, 350, 300, 54);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px -apple-system, sans-serif';
-      ctx.fillText('PRESS SPACE OR CLICK TO START', 400, 380);
+      ctx.fillText('▶ CLICK TO PLAY', 400, 384);
 
       if (Input.isAction()) resetGame();
     }} else if (state === 'PLAYING') {{
@@ -1053,17 +1126,30 @@ def build_flappy_drone_game(title: str = "Aero Drone Odyssey") -> str:
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
+      margin: 0;
+      padding: 0;
+      user-select: none;
     }}
     #game-wrapper {{
       position: relative;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
-      border-radius: 12px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
-      border: 1px solid #1e293b;
     }}
-    canvas {{ display: block; background: #080d1a; }}
+    canvas {{
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      cursor: pointer;
+    }}
     .hud {{
       position: absolute;
       top: 14px;
@@ -1104,6 +1190,10 @@ def build_flappy_drone_game(title: str = "Aero Drone Odyssey") -> str:
   let score = 0;
   let highScore = parseInt(localStorage.getItem('8gen_hs_drone') || '0', 10);
   highEl.innerText = highScore;
+
+  window.addEventListener('click', () => {{
+    if (state === 'MENU' || state === 'GAMEOVER') resetGame();
+  }});
 
   const drone = {{
     x: 180,
@@ -1278,9 +1368,17 @@ def build_flappy_drone_game(title: str = "Aero Drone Odyssey") -> str:
       ctx.font = '16px -apple-system, sans-serif';
       ctx.fillText('CONTROLS: Spacebar, Click, or Touch to Boost Drone', 400, 290);
 
-      ctx.fillStyle = '#f59e0b';
+      const pulse = Math.sin(Date.now() * 0.007) * 0.15 + 0.85;
+      ctx.fillStyle = '#10b981';
+      ctx.globalAlpha = pulse;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(250, 350, 300, 54, 12);
+      else ctx.rect(250, 350, 300, 54);
+      ctx.fill();
+      ctx.globalAlpha = 1.0;
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 22px -apple-system, sans-serif';
-      ctx.fillText('PRESS SPACE OR CLICK TO START', 400, 360);
+      ctx.fillText('▶ CLICK TO FLY', 400, 384);
 
       if (Input.isAction()) resetGame();
     }} else if (state === 'PLAYING') {{

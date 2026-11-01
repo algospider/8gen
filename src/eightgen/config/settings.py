@@ -3,15 +3,18 @@
 import os
 from pathlib import Path
 from typing import Optional
+from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Always load .env file if available
+load_dotenv()
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment, config files, or defaults."""
 
     model_config = SettingsConfigDict(
-        env_prefix="EIGHTGEN_",
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore"
@@ -22,10 +25,15 @@ class Settings(BaseSettings):
 
     # Gemini Settings (Fast & High Playability)
     gemini_api_key: str = Field(
-        default_factory=lambda: os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", "")),
+        default_factory=lambda: (
+            os.getenv("GEMINI_API_KEY")
+            or os.getenv("GOOGLE_API_KEY")
+            or os.getenv("EIGHTGEN_GEMINI_API_KEY")
+            or ""
+        ),
         description="Google Gemini API Key"
     )
-    gemini_model: str = Field(default="gemini-2.5-flash", description="Gemini model name")
+    gemini_model: str = Field(default="gemini-3.8-flash", description="Gemini model name")
     gemini_proxy_url: Optional[str] = Field(
         default=None,
         description="Local OpenAI-compatible Gemini proxy URL (e.g. http://localhost:4981/openai/v1 or http://localhost:8081/v1)"

@@ -106,6 +106,10 @@ class ParticleSystem {
     this.shakeIntensity = Math.max(this.shakeIntensity, amount);
   }
 
+  triggerScreenShake(amount = 12) {
+    this.shake(amount);
+  }
+
   update() {
     // Update particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
@@ -192,6 +196,9 @@ const Input = (() => {
   });
 
   function bindCanvas(canvas) {
+    canvas.setAttribute('tabindex', '0');
+    canvas.style.outline = 'none';
+
     function updatePos(e) {
       const rect = canvas.getBoundingClientRect();
       const scaleX = canvas.width / rect.width;
@@ -207,6 +214,7 @@ const Input = (() => {
 
     canvas.addEventListener('mousemove', (e) => { updatePos(e); });
     canvas.addEventListener('mousedown', (e) => {
+      canvas.focus();
       Sound.init();
       hasInteracted = true;
       isPointerDown = true;
@@ -215,6 +223,7 @@ const Input = (() => {
     window.addEventListener('mouseup', () => { isPointerDown = false; });
 
     canvas.addEventListener('touchstart', (e) => {
+      canvas.focus();
       Sound.init();
       hasInteracted = true;
       isPointerDown = true;

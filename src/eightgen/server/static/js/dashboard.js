@@ -6,6 +6,7 @@ let selectedCategory = "arcade";
 document.addEventListener("DOMContentLoaded", () => {
   setupCategoryTabs();
   setupEventListeners();
+  setupViewportFocus();
   fetchGames();
 });
 
@@ -18,6 +19,41 @@ function setupCategoryTabs() {
       selectedCategory = tab.getAttribute("data-cat") || "arcade";
     });
   });
+}
+
+function setupViewportFocus() {
+  const wbViewport = document.querySelector(".studio-viewport");
+  if (wbViewport) {
+    wbViewport.addEventListener("mouseenter", focusWorkbenchFrame);
+    wbViewport.addEventListener("click", focusWorkbenchFrame);
+  }
+
+  // Forward keyboard controls from parent window to workbench iframe
+  window.addEventListener("keydown", (e) => {
+    const active = document.activeElement;
+    if (active && ["INPUT", "TEXTAREA", "SELECT"].includes(active.tagName)) {
+      return;
+    }
+    const handledKeys = ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"];
+    if (handledKeys.includes(e.code)) {
+      const wb = document.getElementById("workbench-frame");
+      if (wb && wb.contentWindow) {
+        try {
+          wb.contentWindow.focus();
+          wb.contentWindow.dispatchEvent(new KeyboardEvent("keydown", { code: e.code, key: e.key, bubbles: true }));
+        } catch (err) {}
+      }
+    }
+  });
+}
+
+function focusWorkbenchFrame() {
+  const wb = document.getElementById("workbench-frame");
+  if (wb && wb.contentWindow) {
+    try {
+      wb.contentWindow.focus();
+    } catch (e) {}
+  }
 }
 
 function setupEventListeners() {
@@ -62,7 +98,10 @@ function setupEventListeners() {
       if (wb) {
         const src = wb.src;
         wb.src = "about:blank";
-        setTimeout(() => { wb.src = src; }, 50);
+        setTimeout(() => {
+          wb.src = src;
+          setTimeout(focusWorkbenchFrame, 300);
+        }, 60);
       }
     });
   }
@@ -107,9 +146,10 @@ function setupEventListeners() {
     });
   }
 
-  // Preset chips click
+  // Preset chips click: Fill prompt AND launch archetype immediately!
   document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
+    chip.addEventListener("click", (e) => {
+      e.preventDefault();
       const prompt = chip.getAttribute("data-prompt");
       const cat = chip.getAttribute("data-category");
       if (prompt && promptInput) promptInput.value = prompt;
@@ -120,7 +160,17 @@ function setupEventListeners() {
           else t.classList.remove("active");
         });
       }
-      if (promptInput) promptInput.focus();
+
+      // Immediately launch the matching playable archetype into the workbench!
+      if (cat === "shooter" || (prompt && prompt.includes("Space"))) {
+        loadArchetypeIntoWorkbench("shooter", "Neon Space Defender");
+      } else if (prompt && prompt.includes("Snake")) {
+        loadArchetypeIntoWorkbench("snake", "Cyber Snake 2099");
+      } else if (prompt && prompt.includes("Brick")) {
+        loadArchetypeIntoWorkbench("brick", "Quantum Breakout");
+      } else if (prompt && (prompt.includes("Drone") || prompt.includes("Flappy"))) {
+        loadArchetypeIntoWorkbench("drone", "Aero Drone Odyssey");
+      }
     });
   });
 
@@ -196,17 +246,17 @@ async function handleGenerate() {
   const streamPanel = document.getElementById("stream-panel");
   const instantToggle = document.getElementById("instant-mode-toggle");
 
-  const prompt = promptInput ? promptInput.value.trim() : "";
+  let prompt = promptInput ? promptInput.value.trim() : "";
   if (!prompt) {
-    if (promptInput) promptInput.focus();
-    return;
+    prompt = "Retro Space Invaders with laser cannons and alien boss waves";
+    if (promptInput) promptInput.value = prompt;
   }
 
   const category = selectedCategory || "arcade";
   const instant = instantToggle ? instantToggle.checked : false;
 
   generateBtn.disabled = true;
-  generateBtn.innerHTML = `<span>Synthesizing Game...</span>`;
+  generateBtn.innerHTML = `<span>⚡ Synthesizing Game...</span>`;
   streamPanel.style.display = "block";
   streamPanel.textContent = `Connecting to 8Gen engine (instant=${instant})...\n`;
 
@@ -242,7 +292,7 @@ async function handleGenerate() {
         }
         fetchGames();
       } else if (data.type === "error") {
-        streamPanel.textContent += `\n\n✖ Error: ${data.message}\nFalling back to guaranteed archetype...`;
+        streamPanel.textContent += `\n\n✖ Notice: ${data.message}\nCompiling guaranteed playable archetype...`;
         fallbackHttpGenerate(prompt, category, true);
       }
     };
@@ -290,7 +340,10 @@ function loadGameIntoWorkbench(gameId, title) {
   const wbTitle = document.getElementById("workbench-title-label");
 
   if (wbTitle) wbTitle.innerText = `Live Viewport: ${title}`;
-  if (wbFrame) wbFrame.src = `/api/games/${gameId}/play?t=${Date.now()}`;
+  if (wbFrame) {
+    wbFrame.src = `/api/games/${gameId}/play?t=${Date.now()}`;
+    setTimeout(focusWorkbenchFrame, 350);
+  }
 
   const wbSection = document.getElementById("workbench");
   if (wbSection) {
@@ -303,7 +356,10 @@ window.loadArchetypeIntoWorkbench = function(type, title) {
   const wbTitle = document.getElementById("workbench-title-label");
 
   if (wbTitle) wbTitle.innerText = `Live Viewport: ${title}`;
-  if (wbFrame) wbFrame.src = `/api/games/archetype/${type}?t=${Date.now()}`;
+  if (wbFrame) {
+    wbFrame.src = `/api/games/archetype/${type}?t=${Date.now()}`;
+    setTimeout(focusWorkbenchFrame, 350);
+  }
 
   const wbSection = document.getElementById("workbench");
   if (wbSection) {
