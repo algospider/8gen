@@ -39,6 +39,29 @@ function setupEventListeners() {
     refineSubmit.addEventListener("click", handleRefine);
   }
 
+  const saveKeyBtn = document.getElementById("save-key-btn");
+  if (saveKeyBtn) {
+    saveKeyBtn.addEventListener("click", async () => {
+      const key = document.getElementById("gemini-key-input").value.trim();
+      if (!key) return;
+      saveKeyBtn.disabled = true;
+      saveKeyBtn.innerText = "Saving...";
+      try {
+        await fetch("/api/settings/key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ api_key: key, provider: "gemini" }),
+        });
+        saveKeyBtn.innerText = "✔ Saved!";
+        setTimeout(() => { location.reload(); }, 600);
+      } catch (e) {
+        alert("Failed to save key.");
+        saveKeyBtn.disabled = false;
+        saveKeyBtn.innerText = "Save Key";
+      }
+    });
+  }
+
   // Chips click handler
   document.querySelectorAll(".chip").forEach((chip) => {
     chip.addEventListener("click", () => {

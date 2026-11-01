@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel
 
 from eightgen.config.loader import get_settings
 from eightgen.core.agent import Agent
@@ -16,6 +17,11 @@ from eightgen.server.routes.ws import router as ws_router
 SERVER_DIR = Path(__file__).parent
 STATIC_DIR = SERVER_DIR / "static"
 TEMPLATES_DIR = SERVER_DIR / "templates"
+
+
+class KeyUpdateRequest(BaseModel):
+    api_key: str
+    provider: str = "gemini"
 
 
 def create_app() -> FastAPI:
@@ -50,17 +56,21 @@ def create_app() -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     async def dashboard_view(request: Request):
+        current_settings = get_settings()
         return templates.TemplateResponse(
             request=request,
             name="dashboard.html",
             context={
-                "model_name": settings.model,
+                "model_name": current_settings.active_model_display,
+                "provider": current_settings.provider,
+                "has_key": bool(current_settings.gemini_api_key),
             },
         )
 
     @app.get("/games/{game_id}", response_class=HTMLResponse)
     async def game_view(request: Request, game_id: str):
-        agent = Agent(settings)
+        current_settings = get_settings()
+        agent = Agent(current_settings)
         game = agent.get_game(game_id)
         if not game:
             return HTMLResponse("Game not found", status_code=404)
@@ -69,9 +79,38 @@ def create_app() -> FastAPI:
             name="game.html",
             context={
                 "game": game,
-                "model_name": settings.model,
+                "model_name": current_settings.active_model_display,
             },
         )
+
+    @app.post("/api/settings/key")
+    async def save_api_key(payload: KeyUpdateRequest):
+        """Save Gemini API Key to local .env."""
+        env_file = Path("./.env")
+        lines = []
+        if env_file.exists():
+            lines = env_file.read_text().splitlines()
+
+        new_lines = []
+        has_key = False
+        has_provider = False
+        for line in lines:
+            if line.startswith("GEMINI_API_KEY=") or line.startswith("EIGHTGEN_GEMINI_API_KEY="):
+                new_lines.append(f"GEMINI_API_KEY={payload.api_key.strip()}")
+                has_key = True
+            elif line.startswith("EIGHTGEN_PROVIDER=") or line.startswith("PROVIDER="):
+                new_lines.append(f"EIGHTGEN_PROVIDER={payload.provider.strip()}")
+                has_provider = True
+            else:
+                new_lines.append(line)
+
+        if not has_key:
+            new_lines.append(f"GEMINI_API_KEY={payload.api_key.strip()}")
+        if not has_provider:
+            new_lines.append(f"EIGHTGEN_PROVIDER={payload.provider.strip()}")
+
+        env_file.write_text("\n".join(new_lines) + "\n")
+        return {"status": "ok", "provider": payload.provider}
 
     return app
 

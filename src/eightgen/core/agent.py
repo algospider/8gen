@@ -9,7 +9,7 @@ from eightgen.config.settings import Settings
 from eightgen.config.loader import get_settings
 from eightgen.core.generator import GameGenerator
 from eightgen.core.refiner import GameRefiner
-from eightgen.llm.ollama import OllamaProvider
+from eightgen.llm.factory import create_llm_provider
 from eightgen.llm.prompt_builder import PromptBuilder
 from eightgen.storage.database import Database
 from eightgen.storage.models import Game, GameVersion
@@ -31,11 +31,7 @@ class Agent:
         self.repo = GameRepository(self.db, self.settings.output_dir)
 
         # Initialize LLM & Prompts
-        self.provider = OllamaProvider(
-            base_url=self.settings.ollama_url,
-            model=self.settings.model,
-            timeout=self.settings.timeout,
-        )
+        self.provider = create_llm_provider(self.settings)
         self.prompt_builder = PromptBuilder()
 
         # Core Pipelines
@@ -50,13 +46,14 @@ class Agent:
 
 
     async def check_health(self) -> Dict[str, Any]:
-        """Check Ollama connectivity and available models."""
+        """Check LLM provider connectivity and available models."""
         is_up = await self.provider.is_healthy()
         models = await self.provider.list_models() if is_up else []
         return {
+            "provider": self.settings.provider,
+            "connected": is_up,
             "ollama_connected": is_up,
-            "ollama_url": self.settings.ollama_url,
-            "configured_model": self.settings.model,
+            "configured_model": getattr(self.provider, "model", self.settings.model),
             "available_models": models,
             "storage_path": str(self.settings.output_dir.resolve()),
         }

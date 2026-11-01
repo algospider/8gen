@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Arcade Game</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            background: #000;
+        }
+        #instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #fff;
+            font-family: monospace;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="instructions">Press Space to start, Arrow keys to move</div>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let canvasWidth = window.innerWidth;
+        let canvasHeight = window.innerHeight;
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        const instructions = document.getElementById('instructions');
+
+        let gameStatus = 'START';
+        let player = { x: canvasWidth / 2, y: canvasHeight / 2, width: 20, height: 20, speed: 5 };
+        let enemies = [];
+        let bullets = [];
+        let lives = 3;
+        let score = 0;
+        let level = 1;
+        let lastTime = 0;
+
+        function init() {
+            canvas.addEventListener('click', startGame);
+            canvas.addEventListener('keydown', handleInput);
+            canvas.addEventListener('touchstart', handleInput);
+        }
+
+        function startGame() {
+            gameStatus = 'PLAYING';
+            instructions.style.display = 'none';
+            generateEnemies();
+            animate();
+        }
+
+        function handleInput(e) {
+            if (e.type === 'keydown') {
+                e.preventDefault();
+            }
+            if (e.type === 'click' || (e.type === 'keydown' && (e.key === ' ' || e.code === 'Space'))) {
+                if (gameStatus === 'START' || gameStatus === 'GAME OVER') {
+                    startGame();
+                } else if (gameStatus === 'PLAYING') {
+                    shootBullet();
+                }
+            }
+        }
+
+        function generateEnemies() {
+            for (let i = 0; i < level; i++) {
+                const enemy = {
+                    x: Math.random() * (canvasWidth - 50),
+                    y: Math.random() * (canvasHeight - 50),
+                    width: 30,
+                    height: 30,
+                    speed: 1 + level / 5
+                };
+                enemies.push(enemy);
+            }
+        }
+
+        function shootBullet() {
+            const bullet = {
+                x: player.x + player.width / 2,
+                y: player.y,
+                width: 5,
+                height: 10,
+                speed: 10
+            };
+            bullets.push(bullet);
+        }
+
+        function movePlayer(dx, dy) {
+            player.x += dx * player.speed;
+            player.y += dy * player.speed;
+
+            if (player.x < 0) player.x = 0;
+            if (player.x > canvasWidth - player.width) player.x = canvasWidth - player.width;
+            if (player.y < 0) player.y = 0;
+            if (player.y > canvasHeight - player.height) player.y = canvasHeight - player.height;
+        }
+
+        function moveEnemies() {
+            enemies.forEach(enemy => {
+                enemy.y += enemy.speed;
+                if (enemy.y > canvasHeight) {
+                    enemies.shift();
+                    lives--;
+                    if (lives <= 0) {
+                        gameStatus = 'GAME OVER';
+                        instructions.innerText = 'Game Over. Press Space to restart';
+                        instructions.style.display = 'block';
+                    }
+                }
+            });
+        }
+
+        function moveBullets() {
+            bullets.forEach((bullet, index) => {
+                bullet.y -= bullet.speed;
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+        }
+
+        function checkCollisions() {
+            bullets.forEach((bullet, bulletIndex) => {
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y) {
+                        enemies.splice(enemyIndex, 1);
+                        bullets.splice(bulletIndex, 1);
+                        score += 10;
+                        playSound('score');
+                    }
+                });
+            });
+        }
+
+        function drawPlayer() {
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+
+        function drawEnemies() {
+            ctx.fillStyle = '#f00';
+            enemies.forEach(enemy => {
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
+        }
+
+        function drawBullets() {
+            ctx.fillStyle = '#00f';
+            bullets.forEach(bullet => {
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+        }
+
+        function drawHUD() {
+            ctx.fillStyle = '#fff';
+            ctx.font = '16px monospace';
+            ctx.fillText(`Score: ${score}`, 10, 20);
+            ctx.fillText(`Lives: ${lives}`, 10, 40);
+        }
+
+        function playSound(type) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            if (type === 'score') {
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+            } else if (type === 'explosion') {
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+            }
+
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function animate(timestamp) {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            if (gameStatus === 'PLAYING') {
+                movePlayer(0, 0);
+                if (typeof lastTime !== 'undefined') {
+                    if (timestamp - lastTime > 1000 / 60) {
+                        moveEnemies();
+                        moveBullets();
+                        checkCollisions();
+                        lastTime = timestamp;
+                    }
+                }
+            }
+            drawPlayer();
+            drawEnemies();
+            drawBullets();
+            drawHUD();
+            if (gameStatus !== 'START') {
+                requestAnimationFrame(animate);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

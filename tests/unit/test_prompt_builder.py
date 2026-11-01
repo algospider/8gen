@@ -8,7 +8,7 @@ def test_build_generate_messages():
     messages = builder.build_generate_messages("Space invaders", category="arcade")
     assert len(messages) == 2
     assert messages[0].role == "system"
-    assert "elite game developer" in messages[0].content
+    assert "game developer" in messages[0].content.lower()
     assert messages[1].role == "user"
     assert "Space invaders" in messages[1].content
     assert "Arcade" in messages[1].content

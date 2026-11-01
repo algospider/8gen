@@ -27,18 +27,16 @@ fi
 # Activate virtualenv
 source .venv/bin/activate
 
-# Check if Ollama is running
-if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
-    echo ""
-    echo "⚠️  Ollama does not appear to be running on http://localhost:11434."
-    if command -v ollama &> /dev/null; then
-        echo "   Attempting to start Ollama in background..."
-        ollama serve > /dev/null 2>&1 &
-        sleep 2
-    else
-        echo "   Please make sure Ollama is installed from https://ollama.com and running."
-    fi
+# Load .env if present
+if [ -f ".env" ]; then
+    export $(grep -v '^#' .env | xargs) > /dev/null 2>&1 || true
 fi
 
-# Launch 8Gen Interactive Wizard
+if [ -n "$GEMINI_API_KEY" ]; then
+    echo "⚡ Engine: Google Gemini API (Ultra-fast generation mode active)"
+else
+    echo "ℹ️ Engine: Local Ollama (Set GEMINI_API_KEY for 100x faster generation)"
+fi
+
+# Launch 8Gen
 python3 -m eightgen "$@"
