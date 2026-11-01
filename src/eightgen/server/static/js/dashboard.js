@@ -62,6 +62,67 @@ function setupEventListeners() {
     });
   }
 
+  // Image Generation Handler
+  const generateImgBtn = document.getElementById("generate-image-btn");
+  const imgPromptInput = document.getElementById("image-prompt-input");
+  const imgStyleSelect = document.getElementById("image-style-select");
+  const imgResultBox = document.getElementById("image-result-box");
+  const imgResultThumb = document.getElementById("image-result-thumb");
+  const imgResultDesc = document.getElementById("image-result-desc");
+  const copyDataUrlBtn = document.getElementById("copy-data-url-btn");
+  const downloadAssetLink = document.getElementById("download-asset-link");
+
+  let lastImageDataUrl = "";
+
+  if (generateImgBtn) {
+    generateImgBtn.addEventListener("click", async () => {
+      const prompt = imgPromptInput.value.trim();
+      if (!prompt) return;
+
+      generateImgBtn.disabled = true;
+      generateImgBtn.innerHTML = "<span>Synthesizing Art...</span>";
+
+      try {
+        const res = await fetch("/api/images/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: prompt,
+            style: imgStyleSelect.value,
+          }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "Image generation failed");
+        }
+
+        const data = await res.json();
+        lastImageDataUrl = data.data_url;
+        imgResultThumb.src = data.data_url;
+        imgResultDesc.innerText = prompt;
+        downloadAssetLink.href = data.data_url;
+        downloadAssetLink.download = data.filename || "asset.png";
+        imgResultBox.style.display = "flex";
+      } catch (err) {
+        alert(`Image Generation: ${err.message}`);
+      } finally {
+        generateImgBtn.disabled = false;
+        generateImgBtn.innerHTML = "<span>🎨 Generate Image</span>";
+      }
+    });
+  }
+
+  if (copyDataUrlBtn) {
+    copyDataUrlBtn.addEventListener("click", () => {
+      if (lastImageDataUrl) {
+        navigator.clipboard.writeText(lastImageDataUrl);
+        copyDataUrlBtn.innerText = "✔ Copied!";
+        setTimeout(() => { copyDataUrlBtn.innerText = "📋 Copy Data URL"; }, 2000);
+      }
+    });
+  }
+
   // Chips click handler
   document.querySelectorAll(".chip").forEach((chip) => {
     chip.addEventListener("click", () => {

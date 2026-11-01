@@ -122,6 +122,45 @@
   <pre id="stream-panel" class="stream-panel"></pre>
 </section>
 
+<!-- AI Image & Asset Studio -->
+<section class="generator-box" style="margin-bottom: 36px; background: linear-gradient(180deg, #182236 0%, #111827 100%); border-color: #3b5074;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+    <h2 style="font-size: 22px; font-weight: 700; color: #38bdf8;">🎨 AI Sprite & Asset Generator (Gemini Image Gen)</h2>
+    <span class="chip-label" style="color: var(--accent);">✨ Text-to-Image / Imagen</span>
+  </div>
+  <p class="generator-subtitle" style="margin-bottom: 16px;">Create pixel-art sprites, game backgrounds, and arcade icons to drop straight into your games.</p>
+
+  <div class="input-row">
+    <input
+      type="text"
+      id="image-prompt-input"
+      class="input-prompt"
+      placeholder="e.g. Glowing neon spaceship fighter sprite, isolated on black..."
+      autocomplete="off"
+    />
+    <select id="image-style-select" class="select-category">
+      <option value="pixel-art">16-Bit Pixel Art</option>
+      <option value="retro-arcade">Retro Arcade Graphic</option>
+      <option value="scifi-background">Game Background Scene</option>
+    </select>
+    <button id="generate-image-btn" class="btn-generate" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white;">
+      <span>🎨 Generate Image</span>
+    </button>
+  </div>
+
+  <div id="image-result-box" style="display: none; margin-top: 16px; padding: 16px; background: #0b1120; border-radius: 12px; border: 1px solid var(--border); align-items: center; gap: 20px;">
+    <img id="image-result-thumb" src="" alt="Generated Asset" style="width: 120px; height: 120px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border);" />
+    <div style="flex: 1;">
+      <h4 id="image-result-title" style="font-size: 15px; margin-bottom: 4px;">Asset Created</h4>
+      <p id="image-result-desc" style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;"></p>
+      <div style="display: flex; gap: 10px;">
+        <button id="copy-data-url-btn" class="btn-card btn-refine" style="padding: 6px 14px; font-size: 13px;">📋 Copy Data URL</button>
+        <a id="download-asset-link" href="" download class="btn-card btn-play" style="padding: 6px 14px; font-size: 13px; text-decoration: none;">⬇ Download PNG</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Gallery Section -->
 <section>
   <div class="gallery-header">

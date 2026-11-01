@@ -3,5 +3,6 @@
 from eightgen.server.routes.games import router as games_router
 from eightgen.server.routes.generate import router as generate_router
 from eightgen.server.routes.ws import router as ws_router
+from eightgen.server.routes.images import router as images_router
 
-__all__ = ["games_router", "generate_router", "ws_router"]
+__all__ = ["games_router", "generate_router", "ws_router", "images_router"]

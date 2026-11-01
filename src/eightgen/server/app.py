@@ -13,6 +13,7 @@ from eightgen.core.agent import Agent
 from eightgen.server.routes.games import router as games_router
 from eightgen.server.routes.generate import router as generate_router
 from eightgen.server.routes.ws import router as ws_router
+from eightgen.server.routes.images import router as images_router
 
 SERVER_DIR = Path(__file__).parent
 STATIC_DIR = SERVER_DIR / "static"
@@ -46,6 +47,11 @@ def create_app() -> FastAPI:
     # Mount static assets
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
+    # Mount generated game assets (sprites, backgrounds)
+    assets_dir = settings.output_dir / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/static/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
     # Templates
     templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
@@ -53,6 +59,7 @@ def create_app() -> FastAPI:
     app.include_router(games_router)
     app.include_router(generate_router)
     app.include_router(ws_router)
+    app.include_router(images_router)
 
     @app.get("/", response_class=HTMLResponse)
     async def dashboard_view(request: Request):

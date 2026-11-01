@@ -9,6 +9,7 @@ from eightgen.cli.commands.serve import serve_cmd
 from eightgen.cli.commands.export import export_cmd
 from eightgen.cli.commands.config import config_cmd
 from eightgen.cli.commands.wizard import wizard_cmd, run_interactive_wizard
+from eightgen.cli.commands.image import image_cmd
 
 
 @click.group(invoke_without_command=True)
@@ -21,6 +22,7 @@ def cli(ctx: click.Context) -> None:
 
 
 cli.add_command(wizard_cmd)
+cli.add_command(image_cmd)
 cli.add_command(generate_cmd)
 cli.add_command(refine_cmd)
 cli.add_command(list_cmd)
