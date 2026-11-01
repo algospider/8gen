@@ -1,6 +1,6 @@
 # 🎮 8Gen — Beginner's Quickstart Guide
 
-Welcome! **8Gen** is an AI agent that creates playable games on your computer. You don't need any coding experience—just describe an idea, and your local AI will code and open a playable game in your web browser.
+Welcome! **8Gen** is an AI agent that creates playable games and game art on your computer in seconds. You don't need any coding experience!
 
 ---
 
@@ -11,93 +11,76 @@ Just run:
 ./start.sh
 ```
 
-That's it! It will automatically check your setup and open an interactive game creator where you can pick a game or type your own idea.
-
 ---
 
-## 🕹️ 3 Fun Ways to Use 8Gen
+## 🎨 AI Image & Game Asset Studio (Gemini Image Gen)
 
-### Option 1: The Interactive Wizard (Recommended for Beginners)
-Run in your terminal:
+8Gen now includes a built-in **AI Game Asset Generator** that can create:
+- **16-bit Pixel Art Sprites** (characters, spaceships, monsters, powerups)
+- **Game Background Scenes** (cyberpunk cities, deep space nebulas, dungeons)
+- **Retro Arcade Graphics & Icons**
+
+### Generate Images from Command Line
 ```bash
-8gen
-```
-You'll see a friendly menu:
-```
-What would you like to do?
-1) 🎮 Create a new game
-2) 🌐 Open the Web Studio
-3) 🕹️ Play existing games
-4) 🔧 Check Ollama setup
-```
-Pick **1**, select a starter game (like Space Invaders or Snake), and watch it create and launch the game in your browser!
+# Generate a pixel art starfighter sprite
+8gen image "neon starfighter spaceship sprite" --style pixel-art
 
----
+# Generate a retro game background
+8gen image "cyberpunk city skyline with neon billboards" --style scifi-background
 
-### Option 2: The Visual Web Studio (In Your Browser)
-If you prefer clicking buttons in your web browser:
+# Generate a game item icon
+8gen image "golden pixel coin powerup with glowing aura"
+```
+The generated PNG is automatically saved to `games/assets/` and opened in your image viewer!
+
+### Generate Images from Web Studio
+Run:
 ```bash
 8gen serve
 ```
-Open **[http://localhost:8000](http://localhost:8000)**:
-- Click on any starter game card (🚀 Space Invaders, 🐍 Snake, 🧱 Brick Breaker, etc.)
-- Click **Generate Game**
-- Play directly in your browser with full-screen support!
+Open **[http://localhost:8000](http://localhost:8000)** and scroll to the **🎨 AI Sprite & Asset Generator** section:
+1. Type a description (e.g. *"glowing retro laser cannon"*).
+2. Click **Generate Image**.
+3. Click **Copy Data URL** to paste directly into your HTML game, or **Download PNG**!
 
 ---
 
+## ⚡ How to Connect Gemini Web-to-API or Google Gemini
+
+8Gen supports both:
+1. **Gemini Web-to-API (from your `oorja` or `gemini-web2api` setup)**:
+   - Connects automatically to `http://localhost:4981/openai/v1` or `http://localhost:8081/v1`
+   - Gives access to Gemini Web models + Text-to-Image / Imagen models!
+2. **Google Gemini API**:
+   - Set key with `8gen config set-key YOUR_KEY` or in the web dashboard.
+   - Ultra-fast 2-second game synthesis!
+
+---
+
+## 🕹️ 3 Fun Ways to Play & Create
+
+### Option 1: The Interactive Wizard
+```bash
+8gen
+```
+Select a starter game (Space Invaders, Snake, Brick Breaker, Pong), and watch it create and launch the game in your browser!
+
+### Option 2: The Visual Web Studio
+```bash
+8gen serve
+```
+Open [http://localhost:8000](http://localhost:8000) to browse your gallery, play games in fullscreen, generate new games with live streaming, and generate game art assets.
+
 ### Option 3: Instant One-Liner in Terminal
-If you just want to generate a game immediately from the command line:
 ```bash
 8gen generate "retro space shooter with laser cannons"
 ```
-Your default web browser will automatically open with the playable game as soon as it's ready.
 
 ---
 
 ## 🪄 How to Improve / Change a Game ("Refining")
 
-Did you make a game and want to add something? You can ask the AI to change it!
-
-Just run:
 ```bash
 8gen refine last "make the ball faster and add explosion sound effects"
 ```
-Or in the Web Studio:
-- Click the **⚡ Refine** button on any game card
-- Type what you want to change (e.g. "add power-ups", "make enemies shoot back")
-- The AI will update your game!
-
----
-
-## 📋 Common Game Ideas You Can Try
-
-Copy and paste any of these to see what happens:
-- `8gen generate "cyberpunk flappy drone flying through electric neon gates with score counter"`
-- `8gen generate "brick breaker breakout game with bouncy ball and multicolored destructible bricks"`
-- `8gen generate "classic retro snake game with glowing tail and speed bonuses"`
-- `8gen generate "match 3 jewel puzzle game with combos and sparkles"`
-- `8gen generate "2-player pong game with bouncy physics and score counter to 5"`
-
----
-
-## ❓ Frequently Asked Questions & Troubleshooting
-
-### Q: What controls do the games use?
-Most arcade games use:
-- **Arrow keys** or **W / A / S / D** to move
-- **Spacebar** to shoot or jump
-- **Mouse / Touch** to aim, click, or drag
-
-### Q: Do I need internet access?
-No! Once Ollama and your model are downloaded, 8Gen runs **100% offline** on your computer.
-
-### Q: "Cannot reach Ollama" error?
-Make sure the free [Ollama app](https://ollama.com) is installed and running:
-- Open the **Ollama** application on your Mac/PC, or
-- Run `ollama serve` in a terminal window.
-
-To check your connection anytime:
-```bash
-8gen config check
-```
+Or in the Web Studio, click the **⚡ Refine** button on any game card!
