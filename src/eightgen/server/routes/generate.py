@@ -17,6 +17,7 @@ class GenerateRequest(BaseModel):
     prompt: str
     category: Optional[str] = None
     model: Optional[str] = None
+    instant: bool = False
 
 
 @router.post("")
@@ -29,6 +30,7 @@ async def generate_game(payload: GenerateRequest, agent: Agent = Depends(get_age
             prompt=payload.prompt,
             category=payload.category,
             auto_open=False,
+            instant=payload.instant,
         )
         return game.model_dump(mode="json")
     except Exception as e:

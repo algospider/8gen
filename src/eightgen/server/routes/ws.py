@@ -21,6 +21,7 @@ async def websocket_generate(websocket: WebSocket):
         prompt = data.get("prompt", "").strip()
         category = data.get("category")
         override_model = data.get("model")
+        instant = data.get("instant", False)
 
         if not prompt:
             await websocket.send_json({"type": "error", "message": "Prompt is required."})
@@ -44,6 +45,7 @@ async def websocket_generate(websocket: WebSocket):
             category=category,
             stream_callback=_stream_delta,
             auto_open=False,
+            instant=instant,
         )
 
         await websocket.send_json({

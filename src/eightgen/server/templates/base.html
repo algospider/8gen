@@ -3,26 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}8Gen — AI Instant Game Studio{% endblock %}</title>
-  <link rel="stylesheet" href="/static/css/dashboard.css">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+  <title>{% block title %}8Gen — Autonomous Instant Game Studio{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/design-system.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
   {% block head %}{% endblock %}
 </head>
 <body>
-  <header class="header">
-    <div class="logo-container">
-      <div class="logo-badge">8Gen</div>
-      <div class="logo-title">Instant Game Studio</div>
-    </div>
-    <div class="model-pill">
-      <span class="pulse-dot"></span>
-      <span>Model: {{ model_name }}</span>
+  <!-- Specification-Compliant Top Nav (64px, White Canvas, Hairline Border) -->
+  <header class="top-nav">
+    <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+      <div style="display: flex; align-items: center; gap: 32px;">
+        <a href="/" class="nav-brand">
+          <div class="nav-logo-mark">8</div>
+          <span>8Gen Studio</span>
+        </a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="/#workbench" class="nav-link active">Studio Workbench</a></li>
+            <li><a href="/#archetypes" class="nav-link">Guaranteed Archetypes</a></li>
+            <li><a href="/#assets" class="nav-link">AI Asset Gen</a></li>
+            <li><a href="/#library" class="nav-link">Local Library</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="nav-actions">
+        <div class="badge-pill status-live" title="Autonomous Local Engine">
+          <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: var(--color-success); margin-right: 4px;"></span>
+          <span id="active-model-nav">{{ model_name }}</span>
+        </div>
+        <a href="/#workbench" class="btn-primary" style="height: 36px; padding: 8px 16px; font-size: 13px;">
+          + New Game
+        </a>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    {% block content %}{% endblock %}
-  </main>
+  <!-- Page Content -->
+  {% block content %}{% endblock %}
+
+  <!-- Specification-Compliant Universal SaaS Footer (Surface-Dark #101010) -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+            <div class="nav-logo-mark" style="background: #ffffff; color: #111111;">8</div>
+            <strong style="color: #ffffff; font-size: 16px;">8Gen Autonomous Game Studio</strong>
+          </div>
+          <p style="font-size: 14px; line-height: 1.6; max-width: 380px; margin-bottom: 16px;">
+            Engineered local-first AI game synthesizer. Generates single-file HTML5 games with zero external dependencies, 60fps canvas physics, Web Audio synthesizer, and particle effects.
+          </p>
+          <div class="badge-pill" style="background: #1a1a1a; color: #a1a1aa; border-color: #2a2a2a;">
+            Release: alpha • Universal SaaS Spec
+          </div>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Engine Core</div>
+          <ul class="footer-links">
+            <li><a href="#workbench" class="footer-link">Studio Workbench</a></li>
+            <li><a href="#archetypes" class="footer-link">Guaranteed Archetypes</a></li>
+            <li><a href="#assets" class="footer-link">Procedural Web Audio</a></li>
+            <li><a href="#assets" class="footer-link">Particle Burst System</a></li>
+            <li><a href="#library" class="footer-link">Cross-Platform Input</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">AI Engine</div>
+          <ul class="footer-links">
+            <li><span class="footer-link" style="color: #ffffff;">Google Gemini 2.5 Flash</span></li>
+            <li><span class="footer-link">Gemini Web-to-API</span></li>
+            <li><span class="footer-link">Google Imagen 3</span></li>
+            <li><span class="footer-link">Local Ollama Runtime</span></li>
+            <li><span class="footer-link">Self-Healing Validator</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="footer-col-title">Local Tools</div>
+          <ul class="footer-links">
+            <li><a href="/api/games" class="footer-link">JSON API Endpoint</a></li>
+            <li><a href="/docs" target="_blank" class="footer-link">OpenAPI Swagger Docs</a></li>
+            <li><a href="#workbench" class="footer-link">CLI: <code>8gen wizard</code></a></li>
+            <li><a href="#assets" class="footer-link">Asset Generator</a></li>
+            <li><a href="#library" class="footer-link">HTML5 Zero-Cloud Export</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 8Gen Studio. All games run 100% locally in your browser.</div>
+        <div style="display: flex; gap: 16px; align-items: center;">
+          <span style="color: #34d399;">● Local Server Online</span>
+          <span>Port 8000</span>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   <script src="/static/js/dashboard.js"></script>
   {% block scripts %}{% endblock %}

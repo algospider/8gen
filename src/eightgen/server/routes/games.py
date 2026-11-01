@@ -8,6 +8,12 @@ from pydantic import BaseModel
 
 from eightgen.config.loader import get_settings
 from eightgen.core.agent import Agent
+from eightgen.core.engine.archetypes import (
+    build_space_shooter_game,
+    build_brick_breaker_game,
+    build_cyber_snake_game,
+    build_flappy_drone_game,
+)
 from eightgen.storage.models import Game
 
 router = APIRouter(prefix="/api/games", tags=["games"])
@@ -15,6 +21,21 @@ router = APIRouter(prefix="/api/games", tags=["games"])
 
 def get_agent() -> Agent:
     return Agent(get_settings())
+
+
+@router.get("/archetype/{name}", response_class=HTMLResponse)
+def get_archetype_html(name: str):
+    """Serve a guaranteed playable arcade archetype instantly."""
+    n = name.lower()
+    if "shooter" in n or "space" in n:
+        return HTMLResponse(content=build_space_shooter_game("Neon Space Defender"))
+    elif "snake" in n:
+        return HTMLResponse(content=build_cyber_snake_game("Cyber Snake 2099"))
+    elif "brick" in n or "breaker" in n:
+        return HTMLResponse(content=build_brick_breaker_game("Quantum Breakout"))
+    elif "drone" in n or "flappy" in n:
+        return HTMLResponse(content=build_flappy_drone_game("Aero Drone Odyssey"))
+    return HTMLResponse(content=build_space_shooter_game("Neon Space Defender"))
 
 
 class RefineRequest(BaseModel):

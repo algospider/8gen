@@ -20,5 +20,10 @@ htmlcov/
 .env
 8gen.toml
 
+# Local Generated Games & DB
+games/*.html
+games/8gen.db
+games/assets/
+
 # macOS
 .DS_Store

@@ -1,26 +1,47 @@
-// 8Gen Dashboard UI logic
+// 8Gen Autonomous Game Studio - Universal SaaS Dashboard Logic
 
 let activeGameId = null;
+let selectedCategory = "arcade";
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetchGames();
+  setupCategoryTabs();
   setupEventListeners();
+  fetchGames();
 });
+
+function setupCategoryTabs() {
+  const tabs = document.querySelectorAll(".category-tab");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      selectedCategory = tab.getAttribute("data-cat") || "arcade";
+    });
+  });
+}
 
 function setupEventListeners() {
   const generateBtn = document.getElementById("generate-btn");
   const promptInput = document.getElementById("prompt-input");
   const modalClose = document.getElementById("modal-close");
   const fullscreenBtn = document.getElementById("fullscreen-btn");
-  const refineSubmit = document.getElementById("refine-submit");
+  const refreshGamesBtn = document.getElementById("refresh-games-btn");
+  const saveKeyBtn = document.getElementById("save-key-btn");
+  const wbRestartBtn = document.getElementById("wb-restart-btn");
+  const wbFullscreenBtn = document.getElementById("wb-fullscreen-btn");
 
-  generateBtn.addEventListener("click", handleGenerate);
-  promptInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleGenerate();
-    }
-  });
+  if (generateBtn) {
+    generateBtn.addEventListener("click", handleGenerate);
+  }
+
+  if (promptInput) {
+    promptInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleGenerate();
+      }
+    });
+  }
 
   if (modalClose) {
     modalClose.addEventListener("click", closeModal);
@@ -29,40 +50,85 @@ function setupEventListeners() {
   if (fullscreenBtn) {
     fullscreenBtn.addEventListener("click", () => {
       const iframe = document.getElementById("game-frame");
-      if (iframe.requestFullscreen) {
+      if (iframe && iframe.requestFullscreen) {
         iframe.requestFullscreen();
       }
     });
   }
 
-  if (refineSubmit) {
-    refineSubmit.addEventListener("click", handleRefine);
+  if (wbRestartBtn) {
+    wbRestartBtn.addEventListener("click", () => {
+      const wb = document.getElementById("workbench-frame");
+      if (wb) {
+        const src = wb.src;
+        wb.src = "about:blank";
+        setTimeout(() => { wb.src = src; }, 50);
+      }
+    });
   }
 
-  const saveKeyBtn = document.getElementById("save-key-btn");
+  if (wbFullscreenBtn) {
+    wbFullscreenBtn.addEventListener("click", () => {
+      const wb = document.getElementById("workbench-frame");
+      if (wb && wb.requestFullscreen) {
+        wb.requestFullscreen();
+      }
+    });
+  }
+
+  if (refreshGamesBtn) {
+    refreshGamesBtn.addEventListener("click", fetchGames);
+  }
+
   if (saveKeyBtn) {
     saveKeyBtn.addEventListener("click", async () => {
-      const key = document.getElementById("gemini-key-input").value.trim();
+      const keyInput = document.getElementById("gemini-key-input");
+      const key = keyInput.value.trim();
       if (!key) return;
       saveKeyBtn.disabled = true;
       saveKeyBtn.innerText = "Saving...";
       try {
-        await fetch("/api/settings/key", {
+        const res = await fetch("/api/settings/key", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ api_key: key, provider: "gemini" }),
         });
-        saveKeyBtn.innerText = "✔ Saved!";
-        setTimeout(() => { location.reload(); }, 600);
+        if (res.ok) {
+          saveKeyBtn.innerText = "✔ Saved!";
+          setTimeout(() => { location.reload(); }, 600);
+        } else {
+          throw new Error("Save failed");
+        }
       } catch (e) {
-        alert("Failed to save key.");
+        alert("Failed to save Gemini key.");
         saveKeyBtn.disabled = false;
         saveKeyBtn.innerText = "Save Key";
       }
     });
   }
 
+  // Preset chips click
+  document.querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const prompt = chip.getAttribute("data-prompt");
+      const cat = chip.getAttribute("data-category");
+      if (prompt && promptInput) promptInput.value = prompt;
+      if (cat) {
+        selectedCategory = cat;
+        document.querySelectorAll(".category-tab").forEach((t) => {
+          if (t.getAttribute("data-cat") === cat) t.classList.add("active");
+          else t.classList.remove("active");
+        });
+      }
+      if (promptInput) promptInput.focus();
+    });
+  });
+
   // Image Generation Handler
+  setupImageGenerator();
+}
+
+function setupImageGenerator() {
   const generateImgBtn = document.getElementById("generate-image-btn");
   const imgPromptInput = document.getElementById("image-prompt-input");
   const imgStyleSelect = document.getElementById("image-style-select");
@@ -80,7 +146,7 @@ function setupEventListeners() {
       if (!prompt) return;
 
       generateImgBtn.disabled = true;
-      generateImgBtn.innerHTML = "<span>Synthesizing Art...</span>";
+      generateImgBtn.innerHTML = "<span>🎨 Synthesizing...</span>";
 
       try {
         const res = await fetch("/api/images/generate", {
@@ -108,7 +174,7 @@ function setupEventListeners() {
         alert(`Image Generation: ${err.message}`);
       } finally {
         generateImgBtn.disabled = false;
-        generateImgBtn.innerHTML = "<span>🎨 Generate Image</span>";
+        generateImgBtn.innerHTML = "<span>🎨 Synthesize Asset</span>";
       }
     });
   }
@@ -122,44 +188,154 @@ function setupEventListeners() {
       }
     });
   }
-
-  // Chips click handler
-  document.querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const prompt = chip.getAttribute("data-prompt");
-      const category = chip.getAttribute("data-category");
-      if (prompt) promptInput.value = prompt;
-      if (category) {
-        const select = document.getElementById("category-select");
-        if (select) select.value = category;
-      }
-      promptInput.focus();
-    });
-  });
 }
+
+async function handleGenerate() {
+  const promptInput = document.getElementById("prompt-input");
+  const generateBtn = document.getElementById("generate-btn");
+  const streamPanel = document.getElementById("stream-panel");
+  const instantToggle = document.getElementById("instant-mode-toggle");
+
+  const prompt = promptInput ? promptInput.value.trim() : "";
+  if (!prompt) {
+    if (promptInput) promptInput.focus();
+    return;
+  }
+
+  const category = selectedCategory || "arcade";
+  const instant = instantToggle ? instantToggle.checked : false;
+
+  generateBtn.disabled = true;
+  generateBtn.innerHTML = `<span>Synthesizing Game...</span>`;
+  streamPanel.style.display = "block";
+  streamPanel.textContent = `Connecting to 8Gen engine (instant=${instant})...\n`;
+
+  // WebSocket or fallback to HTTP
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${window.location.host}/ws/generate`;
+
+  let ws;
+  try {
+    ws = new WebSocket(wsUrl);
+  } catch (e) {
+    console.warn("WebSocket unavailable, falling back to HTTP");
+  }
+
+  if (ws) {
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ prompt, category, instant }));
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "start") {
+        streamPanel.textContent += `Synthesizing game for: "${prompt}"...\n\n`;
+      } else if (data.type === "delta") {
+        streamPanel.textContent += data.chunk;
+        streamPanel.scrollTop = streamPanel.scrollHeight;
+      } else if (data.type === "completed") {
+        streamPanel.textContent += "\n\n✔ Game successfully synthesized and validated!";
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = `<span>⚡ Generate & Launch Game</span>`;
+        if (data.game) {
+          loadGameIntoWorkbench(data.game.id, data.game.title);
+        }
+        fetchGames();
+      } else if (data.type === "error") {
+        streamPanel.textContent += `\n\n✖ Error: ${data.message}\nFalling back to guaranteed archetype...`;
+        fallbackHttpGenerate(prompt, category, true);
+      }
+    };
+
+    ws.onerror = () => {
+      fallbackHttpGenerate(prompt, category, instant);
+    };
+  } else {
+    fallbackHttpGenerate(prompt, category, instant);
+  }
+}
+
+async function fallbackHttpGenerate(prompt, category, instant) {
+  const generateBtn = document.getElementById("generate-btn");
+  const streamPanel = document.getElementById("stream-panel");
+
+  try {
+    streamPanel.textContent += "\nDispatching local REST synthesis request...";
+    const res = await fetch("/api/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, category, instant }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Generation failed");
+    }
+
+    const game = await res.json();
+    streamPanel.textContent += "\n✔ Game created successfully!";
+    loadGameIntoWorkbench(game.id, game.title);
+    fetchGames();
+  } catch (err) {
+    streamPanel.textContent += `\n✖ Error: ${err.message}`;
+  } finally {
+    generateBtn.disabled = false;
+    generateBtn.innerHTML = `<span>⚡ Generate & Launch Game</span>`;
+  }
+}
+
+function loadGameIntoWorkbench(gameId, title) {
+  activeGameId = gameId;
+  const wbFrame = document.getElementById("workbench-frame");
+  const wbTitle = document.getElementById("workbench-title-label");
+
+  if (wbTitle) wbTitle.innerText = `Live Viewport: ${title}`;
+  if (wbFrame) wbFrame.src = `/api/games/${gameId}/play?t=${Date.now()}`;
+
+  const wbSection = document.getElementById("workbench");
+  if (wbSection) {
+    wbSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+window.loadArchetypeIntoWorkbench = function(type, title) {
+  const wbFrame = document.getElementById("workbench-frame");
+  const wbTitle = document.getElementById("workbench-title-label");
+
+  if (wbTitle) wbTitle.innerText = `Live Viewport: ${title}`;
+  if (wbFrame) wbFrame.src = `/api/games/archetype/${type}?t=${Date.now()}`;
+
+  const wbSection = document.getElementById("workbench");
+  if (wbSection) {
+    wbSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
 
 async function fetchGames() {
   const grid = document.getElementById("games-grid");
+  const countEl = document.getElementById("game-count");
+
   try {
     const res = await fetch("/api/games");
     const games = await res.json();
+    if (countEl) countEl.innerText = `${games.length} Games`;
     renderGallery(games);
   } catch (err) {
     console.error("Failed to fetch games:", err);
-    grid.innerHTML = `<div class="empty-state">Unable to load library. Is server running?</div>`;
+    if (grid) grid.innerHTML = `<div class="product-mockup-card" style="grid-column: 1 / -1; padding: 32px; text-align: center;"><p class="body-sm">Unable to connect to local game repository.</p></div>`;
   }
 }
 
 function renderGallery(games) {
   const grid = document.getElementById("games-grid");
-  const countEl = document.getElementById("game-count");
-  if (countEl) countEl.innerText = `${games.length} Games`;
+  if (!grid) return;
 
   if (!games || games.length === 0) {
     grid.innerHTML = `
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        <h3>No games generated yet!</h3>
-        <p>Pick an idea above or type your own prompt to create your first game.</p>
+      <div class="product-mockup-card" style="grid-column: 1 / -1; padding: 48px; text-align: center;">
+        <h3 class="title-md" style="margin-bottom: 8px;">No games generated yet</h3>
+        <p class="body-sm" style="margin-bottom: 16px;">Pick a starter preset above or click Generate to create your first game.</p>
+        <a href="#workbench" class="btn-primary">Launch Studio Workbench</a>
       </div>`;
     return;
   }
@@ -167,31 +343,33 @@ function renderGallery(games) {
   grid.innerHTML = games.map((g) => {
     const icon = getCategoryIcon(g.category);
     return `
-      <div class="game-card" data-id="${g.id}">
-        <div class="game-card-preview">
-          <span>${icon}</span>
+      <div class="product-mockup-card" style="padding: 24px; display: flex; flex-direction: column;" data-id="${g.id}">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+          <div style="font-size: 28px;">${icon}</div>
+          <div style="display: flex; gap: 6px;">
+            <span class="badge-pill">v${g.current_version}</span>
+            <span class="badge-pill" style="text-transform: capitalize;">${escapeHtml(g.category || 'arcade')}</span>
+          </div>
         </div>
-        <div class="game-card-body">
-          <div class="game-card-title">${escapeHtml(g.title)}</div>
-          <div class="game-card-prompt">${escapeHtml(g.description || g.title)}</div>
-          <div class="game-card-meta">
-            <span class="version-badge">v${g.current_version}</span>
-            <span>${new Date(g.updated_at).toLocaleDateString()}</span>
-          </div>
-          <div class="card-actions">
-            <button class="btn-card btn-play" onclick="openGame('${g.id}', '${escapeHtml(g.title)}')">
-              ▶ Play
-            </button>
-            <button class="btn-card btn-refine" onclick="promptRefine('${g.id}', '${escapeHtml(g.title)}')">
-              ⚡ Refine
-            </button>
-            <a href="/api/games/${g.id}/download" class="btn-icon" title="Export HTML" download>
-              ⬇
-            </a>
-            <button class="btn-icon delete" onclick="deleteGame('${g.id}')" title="Delete">
-              ✕
-            </button>
-          </div>
+
+        <h3 class="title-md" style="margin-bottom: 6px; font-size: 17px;">${escapeHtml(g.title)}</h3>
+        <p class="body-sm" style="flex: 1; margin-bottom: 16px; font-size: 13px; line-height: 1.4; color: var(--color-muted); max-height: 40px; overflow: hidden; text-overflow: ellipsis;">
+          ${escapeHtml(g.description || g.title)}
+        </p>
+
+        <div style="display: flex; gap: 8px; align-items: center; margin-top: auto;">
+          <button class="btn-primary" style="flex: 1; height: 34px; font-size: 12px; padding: 0 10px;" onclick="loadGameIntoWorkbench('${g.id}', '${escapeHtml(g.title)}')">
+            ▶ Play
+          </button>
+          <button class="btn-secondary" style="height: 34px; font-size: 12px; padding: 0 10px;" onclick="promptRefine('${g.id}', '${escapeHtml(g.title)}')">
+            ⚡ Refine
+          </button>
+          <a href="/api/games/${g.id}/download" class="btn-secondary" style="height: 34px; font-size: 12px; padding: 0 10px; display: inline-flex; align-items: center;" title="Export HTML" download>
+            ⬇
+          </a>
+          <button class="btn-icon-circular" style="width: 34px; height: 34px; font-size: 12px; flex-shrink: 0;" onclick="deleteGame('${g.id}')" title="Delete">
+            ✕
+          </button>
         </div>
       </div>
     `;
@@ -201,101 +379,11 @@ function renderGallery(games) {
 function getCategoryIcon(cat) {
   const c = (cat || "").toLowerCase();
   if (c.includes("shooter") || c.includes("space")) return "🚀";
-  if (c.includes("puzzle") || c.includes("logic")) return "🧩";
-  if (c.includes("platform")) return "🏃";
-  if (c.includes("racing")) return "🏎️";
-  if (c.includes("card") || c.includes("board")) return "🎲";
+  if (c.includes("snake") || c.includes("worm")) return "🐍";
+  if (c.includes("brick") || c.includes("break")) return "🧱";
+  if (c.includes("drone") || c.includes("fly") || c.includes("platform")) return "⚡";
+  if (c.includes("puzzle") || c.includes("match")) return "🧩";
   return "🎮";
-}
-
-async function handleGenerate() {
-  const promptInput = document.getElementById("prompt-input");
-  const categorySelect = document.getElementById("category-select");
-  const generateBtn = document.getElementById("generate-btn");
-  const streamPanel = document.getElementById("stream-panel");
-
-  const prompt = promptInput.value.trim();
-  if (!prompt) return;
-
-  const category = categorySelect.value;
-
-  generateBtn.disabled = true;
-  generateBtn.innerHTML = `<span>Synthesizing...</span>`;
-  streamPanel.style.display = "block";
-  streamPanel.textContent = "Connecting to Ollama AI engine...\n";
-
-  // Use WebSocket for live token streaming
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const wsUrl = `${protocol}//${window.location.host}/ws/generate`;
-
-  let ws;
-  try {
-    ws = new WebSocket(wsUrl);
-  } catch (e) {
-    console.warn("WebSocket not supported, falling back to HTTP");
-  }
-
-  if (ws) {
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ prompt, category }));
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "start") {
-        streamPanel.textContent += `Generating game for: "${prompt}"...\n\n`;
-      } else if (data.type === "delta") {
-        streamPanel.textContent += data.chunk;
-        streamPanel.scrollTop = streamPanel.scrollHeight;
-      } else if (data.type === "completed") {
-        streamPanel.textContent += "\n\n✔ Game successfully built and validated!";
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = `<span>Generate Game</span>`;
-        promptInput.value = "";
-        fetchGames();
-        if (data.game) {
-          openGame(data.game.id, data.game.title);
-        }
-      } else if (data.type === "error") {
-        streamPanel.textContent += `\n\n✖ Error: ${data.message}`;
-        generateBtn.disabled = false;
-        generateBtn.innerHTML = `<span>Generate Game</span>`;
-      }
-    };
-
-    ws.onerror = async () => {
-      // Fallback to REST
-      fallbackHttpGenerate(prompt, category);
-    };
-  } else {
-    fallbackHttpGenerate(prompt, category);
-  }
-}
-
-async function fallbackHttpGenerate(prompt, category) {
-  const generateBtn = document.getElementById("generate-btn");
-  const streamPanel = document.getElementById("stream-panel");
-  try {
-    streamPanel.textContent = "Synthesizing game (please wait)...";
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, category }),
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || "Generation failed");
-    }
-    const game = await res.json();
-    streamPanel.textContent = "✔ Game generated!";
-    fetchGames();
-    openGame(game.id, game.title);
-  } catch (err) {
-    streamPanel.textContent = `✖ Error: ${err.message}`;
-  } finally {
-    generateBtn.disabled = false;
-    generateBtn.innerHTML = `<span>Generate Game</span>`;
-  }
 }
 
 function openGame(gameId, title) {
@@ -304,25 +392,27 @@ function openGame(gameId, title) {
   const modalTitle = document.getElementById("modal-game-title");
   const iframe = document.getElementById("game-frame");
 
-  modalTitle.innerText = title || "Play Game";
-  iframe.src = `/api/games/${gameId}/play?t=${Date.now()}`;
-  modal.style.display = "flex";
+  if (modalTitle) modalTitle.innerText = title || "Play Game";
+  if (iframe) iframe.src = `/api/games/${gameId}/play?t=${Date.now()}`;
+  if (modal) modal.style.display = "flex";
 }
 
 function closeModal() {
   const modal = document.getElementById("game-modal");
   const iframe = document.getElementById("game-frame");
-  modal.style.display = "none";
-  iframe.src = "about:blank";
+  if (modal) modal.style.display = "none";
+  if (iframe) iframe.src = "about:blank";
 }
 
 function promptRefine(gameId, title) {
-  const instruction = prompt(`Refine game "${title}":\n(e.g., "add sound effects", "make enemies shoot lasers", "add power-ups")`);
+  const instruction = prompt(`Refine game "${title}":\n(e.g. "add sound effects", "make enemies shoot lasers", "add double jump")`);
   if (!instruction || !instruction.trim()) return;
 
   const streamPanel = document.getElementById("stream-panel");
-  streamPanel.style.display = "block";
-  streamPanel.textContent = `Refining "${title}" with instruction: "${instruction}"...\nPlease wait...`;
+  if (streamPanel) {
+    streamPanel.style.display = "block";
+    streamPanel.textContent = `Refining "${title}" with: "${instruction}"...\nPlease wait...`;
+  }
 
   fetch(`/api/games/${gameId}/refine`, {
     method: "POST",
@@ -334,12 +424,12 @@ function promptRefine(gameId, title) {
       return res.json();
     })
     .then((updated) => {
-      streamPanel.textContent = `✔ Refinement complete! Game updated to v${updated.current_version}.`;
+      if (streamPanel) streamPanel.textContent = `✔ Refinement complete! Game updated to v${updated.current_version}.`;
+      loadGameIntoWorkbench(updated.id, updated.title);
       fetchGames();
-      openGame(updated.id, updated.title);
     })
     .catch((err) => {
-      streamPanel.textContent = `✖ Refinement error: ${err.message}`;
+      if (streamPanel) streamPanel.textContent = `✖ Refinement error: ${err.message}`;
     });
 }
 

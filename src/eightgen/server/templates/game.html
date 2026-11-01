@@ -1,24 +1,53 @@
 {% extends "base.html" %}
 
-{% block title %}{{ game.title }} — 8Gen{% endblock %}
+{% block title %}{{ game.title }} — 8Gen Studio{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-  <div>
-    <h1 style="font-size: 24px; font-weight: 700;">{{ game.title }}</h1>
-    <p style="color: var(--text-muted); font-size: 14px;">Version {{ game.current_version }} • {{ game.category }}</p>
-  </div>
-  <div style="display: flex; gap: 10px;">
-    <a href="/api/games/{{ game.id }}/download" class="btn-card btn-refine" style="text-decoration: none;" download>
-      ⬇ Export HTML
-    </a>
-    <a href="/" class="btn-card btn-play" style="text-decoration: none;">
-      ← Back to Library
-    </a>
-  </div>
-</div>
+<section class="section-compact" style="background-color: var(--color-canvas);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+          <h1 class="title-lg" style="margin: 0;">{{ game.title }}</h1>
+          <span class="badge-pill">Version {{ game.current_version }}</span>
+          <span class="badge-pill" style="text-transform: capitalize;">{{ game.category }}</span>
+        </div>
+        <p class="body-sm" style="margin: 0;">{{ game.description }}</p>
+      </div>
 
-<div style="height: 70vh; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 20px 35px rgba(0,0,0,0.6);">
-  <iframe src="/api/games/{{ game.id }}/play" style="width: 100%; height: 100%; border: none; background: #000;" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
-</div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="/api/games/{{ game.id }}/download" class="btn-secondary" download>
+          ⬇ Export HTML
+        </a>
+        <button id="fullscreen-view-btn" class="btn-secondary" onclick="toggleIframeFullscreen()">
+          ⛶ Fullscreen
+        </button>
+        <a href="/" class="btn-primary">
+          ← Back to Studio
+        </a>
+      </div>
+    </div>
+
+    <!-- Playable Game Card Frame -->
+    <div class="product-mockup-card" style="padding: 0; background-color: #000000; height: 75vh; position: relative;">
+      <iframe
+        id="standalone-game-frame"
+        src="/api/games/{{ game.id }}/play"
+        style="width: 100%; height: 100%; border: none; display: block;"
+        sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+      ></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleIframeFullscreen() {
+  const frame = document.getElementById("standalone-game-frame");
+  if (frame.requestFullscreen) {
+    frame.requestFullscreen();
+  }
+}
+</script>
 {% endblock %}

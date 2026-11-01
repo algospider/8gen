@@ -64,15 +64,17 @@ class Agent:
         category: Optional[str] = None,
         stream_callback: Optional[Callable[[str], None]] = None,
         auto_open: Optional[bool] = None,
+        instant: bool = False,
     ) -> Game:
         """Generate a brand new game from user prompt."""
-        logger.info(f"Generating game for prompt: '{prompt}'...")
+        logger.info(f"Generating game for prompt: '{prompt}' (instant={instant})...")
 
         # Run generation pipeline
         html_content = await self.generator.generate(
             prompt=prompt,
             category=category,
             stream_callback=stream_callback,
+            instant=instant,
         )
 
         # Infer title and slug

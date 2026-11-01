@@ -9,6 +9,8 @@ from eightgen.llm.prompt_builder import PromptBuilder
 from eightgen.plugins.manager import get_plugin_manager
 from eightgen.utils.logger import get_logger
 
+import inspect
+
 logger = get_logger("eightgen.refiner")
 
 
@@ -56,7 +58,10 @@ class GameRefiner:
             if stream_callback:
                 async for chunk in self.provider.stream(messages, temperature=self.settings.temperature):
                     raw_chunks.append(chunk)
-                    stream_callback(chunk)
+                    if inspect.iscoroutinefunction(stream_callback):
+                        await stream_callback(chunk)
+                    else:
+                        stream_callback(chunk)
                 raw_output = "".join(raw_chunks)
             else:
                 response = await self.provider.generate(messages, temperature=self.settings.temperature)

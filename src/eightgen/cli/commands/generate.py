@@ -16,12 +16,14 @@ from eightgen.core.agent import Agent
 @click.argument("prompt", type=str)
 @click.option("--category", "-c", type=str, default=None, help="Game category (arcade, platformer, puzzle, etc.)")
 @click.option("--model", "-m", type=str, default=None, help="Override Ollama model")
+@click.option("--instant", is_flag=True, default=False, help="Instant 0.05s synthesis with guaranteed playable engine archetype")
 @click.option("--no-open", is_flag=True, default=False, help="Do not automatically open game in browser")
 @click.option("--temperature", "-t", type=float, default=None, help="Sampling temperature")
 def generate_cmd(
     prompt: str,
     category: Optional[str],
     model: Optional[str],
+    instant: bool,
     no_open: bool,
     temperature: Optional[float],
 ) -> None:
@@ -39,7 +41,10 @@ def generate_cmd(
         print_status(f"Requesting game: [bold yellow]\"{prompt}\"[/bold yellow]")
         if category:
             print_status(f"Category: [cyan]{category}[/cyan]")
-        print_status(f"Ollama Model: [magenta]{settings.model}[/magenta]")
+        if instant:
+            print_status("[bold green]Mode: Instant Guaranteed Archetype[/bold green]")
+        else:
+            print_status(f"Model: [magenta]{settings.active_model_display}[/magenta]")
 
         # Stream container
         stream_buffer = []
@@ -47,13 +52,14 @@ def generate_cmd(
         def on_stream(delta: str):
             stream_buffer.append(delta)
 
-        with console.status("[bold green]Synthesizing game code with local AI engine...", spinner="dots"):
+        with console.status("[bold green]Synthesizing game code...", spinner="dots"):
             try:
                 game = await agent.create_game(
                     prompt=prompt,
                     category=category,
                     stream_callback=on_stream if settings.stream_output else None,
                     auto_open=not no_open,
+                    instant=instant,
                 )
             except Exception as e:
                 print_error(f"Generation failed: {e}")

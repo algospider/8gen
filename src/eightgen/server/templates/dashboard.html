@@ -1,200 +1,403 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Beginner Guide Banner -->
-<div class="beginner-banner">
-  <div class="beginner-step">
-    <div class="step-badge">1</div>
-    <div class="step-text">
-      <strong>Pick an Idea</strong>
-      <span>Click any preset below or type what you imagine</span>
-    </div>
-  </div>
-  <div class="step-divider">→</div>
-  <div class="beginner-step">
-    <div class="step-badge">2</div>
-    <div class="step-text">
-      <strong>Instant AI Build</strong>
-      <span>Gemini 2.5 Flash writes the full game in seconds</span>
-    </div>
-  </div>
-  <div class="step-divider">→</div>
-  <div class="beginner-step">
-    <div class="step-badge">3</div>
-    <div class="step-text">
-      <strong>Play Instantly</strong>
-      <span>Runs in your browser with zero downloads</span>
-    </div>
-  </div>
-</div>
+<!-- 1. Hero Band (White Canvas #ffffff, Display-XL, Inter, 96px whitespace rhythm) -->
+<section class="section hero-band" style="padding-top: 72px; padding-bottom: 48px;">
+  <div class="container">
+    <div style="max-width: 860px; margin-bottom: 32px;">
+      <div style="display: flex; gap: 8px; margin-bottom: 16px; align-items: center;">
+        <span class="badge-pill">v0.1.0 Alpha</span>
+        <span class="badge-pill">Universal SaaS Design</span>
+        <span class="badge-pill" style="color: var(--color-success); border-color: #a7f3d0; background-color: #ecfdf5;">● Zero Cloud Lock-In</span>
+      </div>
 
-<!-- Fast Gemini Key Banner -->
-<div id="gemini-key-box" class="key-box" style="margin-bottom: 24px; padding: 14px 20px; background: rgba(6, 182, 212, 0.1); border: 1px solid var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-  <div style="display: flex; align-items: center; gap: 12px;">
-    <span style="font-size: 24px;">⚡</span>
-    <div>
-      <strong style="color: var(--accent);">Ultra-Fast Mode (Google Gemini API)</strong>
-      <div style="font-size: 12px; color: var(--text-muted);">Generates arcade-quality games in ~2 seconds. Free at <a href="https://aistudio.google.com/" target="_blank" style="color: #38bdf8; text-decoration: underline;">aistudio.google.com</a></div>
+      <h1 class="display-xl" style="margin-bottom: 20px;">
+        Generate instant playable games locally with AI.
+      </h1>
+
+      <p class="body-md" style="font-size: 18px; color: var(--color-muted); line-height: 1.6; max-width: 720px; margin-bottom: 28px;">
+        8Gen synthesizes complete single-file HTML5 arcade games with zero-dependency physics, Web Audio procedural sound synthesis, and particle effects in seconds. Built for local developers and creators.
+      </p>
+
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <a href="#workbench" class="btn-primary">
+          Launch Studio Workbench
+        </a>
+        <a href="#archetypes" class="btn-secondary">
+          Explore Guaranteed Archetypes
+        </a>
+        <a href="#library" class="btn-text-link" style="margin-left: 8px;">
+          View Local Library →
+        </a>
+      </div>
     </div>
-  </div>
-  <div style="display: flex; gap: 8px; flex: 1; max-width: 450px;">
-    <input type="password" id="gemini-key-input" class="input-prompt" placeholder="Paste Gemini API Key (AIzaSy...)" style="padding: 8px 12px; font-size: 13px;" />
-    <button id="save-key-btn" class="btn-card btn-play" style="flex: none; padding: 8px 16px; font-size: 13px;">Save Key</button>
-  </div>
-</div>
 
-<!-- Main Generator Section -->
-<section class="generator-box">
-  <h1 class="generator-title">Instant Game Studio</h1>
-  <p class="generator-subtitle">Type any game idea in simple words. 8Gen will synthesize and launch it locally on your computer.</p>
+    <!-- Gemini AI Fast-Mode Setup Card (Clean Minimalist SaaS Bar) -->
+    <div class="product-mockup-card" style="padding: 16px 20px; margin-bottom: 48px; background-color: var(--color-surface-soft);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background-color: var(--color-ink); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 15px;">
+            ⚡
+          </div>
+          <div>
+            <div class="title-sm" style="font-size: 14px; margin-bottom: 2px;">
+              Ultra-Fast Mode: Google Gemini 2.5 Flash API
+            </div>
+            <div class="body-sm" style="font-size: 13px;">
+              Generates high-tactile arcade games in ~1.8 seconds. Free key available at <a href="https://aistudio.google.com/" target="_blank" style="color: var(--color-ink); text-decoration: underline;">aistudio.google.com</a>.
+            </div>
+          </div>
+        </div>
 
-  <div class="input-row">
-    <input
-      type="text"
-      id="prompt-input"
-      class="input-prompt"
-      placeholder="e.g. Neon space shooter with laser cannons, aliens, and sound effects..."
-      autocomplete="off"
-    />
-    <select id="category-select" class="select-category">
-      <option value="arcade">Arcade</option>
-      <option value="shooter">Shooter</option>
-      <option value="platformer">Platformer</option>
-      <option value="puzzle">Puzzle</option>
-      <option value="action">Action</option>
-    </select>
-    <button id="generate-btn" class="btn-generate">
-      <span>✨ Generate Game</span>
-    </button>
-  </div>
-
-  <!-- Popular Presets -->
-  <div style="margin-top: 20px;">
-    <div style="font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">
-      🎮 Popular Starter Games (Click to autofill):
-    </div>
-    <div class="preset-cards-grid">
-      <div class="preset-card chip" data-prompt="Retro Space Invaders with laser cannons, enemy formations, sound effects, and high score" data-category="shooter">
-        <span class="preset-icon">🚀</span>
-        <div class="preset-info">
-          <strong>Space Invaders</strong>
-          <span>Laser cannons & alien waves</span>
-        </div>
-      </div>
-      <div class="preset-card chip" data-prompt="Retro neon Snake game with collectible fruit, speed boosts, glowing trail, and score" data-category="arcade">
-        <span class="preset-icon">🐍</span>
-        <div class="preset-info">
-          <strong>Cyber Snake</strong>
-          <span>Glow trail & fruit bonuses</span>
-        </div>
-      </div>
-      <div class="preset-card chip" data-prompt="Brick breaker breakout game with bouncing ball, colorful destructible blocks, and multiball" data-category="arcade">
-        <span class="preset-icon">🧱</span>
-        <div class="preset-info">
-          <strong>Brick Breaker</strong>
-          <span>Destructible blocks & powerups</span>
-        </div>
-      </div>
-      <div class="preset-card chip" data-prompt="Flappy neon drone flying through electric obstacles with space/click controls and score" data-category="arcade">
-        <span class="preset-icon">⚡</span>
-        <div class="preset-info">
-          <strong>Flappy Drone</strong>
-          <span>Tap/Space to fly through gates</span>
-        </div>
-      </div>
-      <div class="preset-card chip" data-prompt="Retro Pong game with AI opponent, ball acceleration, sound effects, and score to 5" data-category="arcade">
-        <span class="preset-icon">🏓</span>
-        <div class="preset-info">
-          <strong>Retro Pong</strong>
-          <span>Paddle bounce vs smart AI</span>
-        </div>
-      </div>
-      <div class="preset-card chip" data-prompt="Match 3 colorful jewel puzzle game with mouse clicking and explosive combos" data-category="puzzle">
-        <span class="preset-icon">💎</span>
-        <div class="preset-info">
-          <strong>Gem Matcher</strong>
-          <span>3-in-a-row puzzle combos</span>
+        <div style="display: flex; gap: 8px; align-items: center; flex: 1; max-width: 440px; min-width: 280px;">
+          <input
+            type="password"
+            id="gemini-key-input"
+            class="text-input"
+            style="height: 36px; font-size: 13px;"
+            placeholder="Paste Gemini API Key (AIzaSy...)"
+            value="{% if has_key %}••••••••••••••••{% endif %}"
+          />
+          <button id="save-key-btn" class="btn-primary" style="height: 36px; padding: 0 16px; font-size: 13px; flex-shrink: 0;">
+            {% if has_key %}Update Key{% else %}Save Key{% endif %}
+          </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <pre id="stream-panel" class="stream-panel"></pre>
+    <!-- 2. Hero Product Card: Live Studio Workbench Embedded Directly in Hero -->
+    <div id="workbench" class="hero-product-card">
+      <div class="studio-workbench">
+        <!-- Workbench Left Sidebar: The Control Console -->
+        <div class="studio-sidebar">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span class="title-sm" style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-ink);">
+              Studio Console
+            </span>
+            <span class="badge-pill status-live">Ready</span>
+          </div>
+
+          <!-- Category Pill Tabs -->
+          <div style="margin-bottom: 16px;">
+            <label class="caption" style="display: block; margin-bottom: 6px; font-weight: 600;">Category</label>
+            <div class="nav-pill-group" style="width: 100%; display: flex; justify-content: space-between;">
+              <button class="category-tab active" data-cat="arcade" style="flex: 1; text-align: center;">Arcade</button>
+              <button class="category-tab" data-cat="shooter" style="flex: 1; text-align: center;">Shooter</button>
+              <button class="category-tab" data-cat="platformer" style="flex: 1; text-align: center;">Platformer</button>
+              <button class="category-tab" data-cat="puzzle" style="flex: 1; text-align: center;">Puzzle</button>
+            </div>
+          </div>
+
+          <!-- Prompt Input -->
+          <div style="margin-bottom: 14px;">
+            <label class="caption" style="display: block; margin-bottom: 6px; font-weight: 600;">Game Prompt & Mechanics</label>
+            <textarea
+              id="prompt-input"
+              class="text-input"
+              rows="3"
+              style="height: 80px; resize: none; font-size: 13px; line-height: 1.4;"
+              placeholder="e.g. Neon space shooter with laser cannons, aliens, and sound effects..."
+            ></textarea>
+          </div>
+
+          <!-- Speed Mode & Options -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding: 8px 12px; background: var(--color-canvas); border-radius: var(--radius-md); border: 1px solid var(--color-hairline);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="instant-mode-toggle" checked style="cursor: pointer; accent-color: var(--color-primary);" />
+              <label for="instant-mode-toggle" class="body-sm" style="font-size: 13px; color: var(--color-ink); cursor: pointer; user-select: none;">
+                <strong>⚡ Instant Mode</strong> (0.05s response)
+              </label>
+            </div>
+            <span class="caption" style="font-size: 11px;">100% Playable</span>
+          </div>
+
+          <!-- Primary Generate Action -->
+          <button id="generate-btn" class="btn-primary" style="width: 100%; margin-bottom: 16px; height: 42px;">
+            <span>⚡ Generate & Launch Game</span>
+          </button>
+
+          <!-- Starter Preset Chips -->
+          <div style="margin-bottom: 16px;">
+            <div class="caption" style="margin-bottom: 8px; font-weight: 600;">Starter Presets (Click to autofill):</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button class="chip btn-secondary" style="height: auto; padding: 8px 10px; justify-content: flex-start; text-align: left; font-size: 12px;" data-prompt="Retro Space Invaders with laser cannons, enemy formations, sound effects, and high score" data-category="shooter">
+                🚀 Space Invaders
+              </button>
+              <button class="chip btn-secondary" style="height: auto; padding: 8px 10px; justify-content: flex-start; text-align: left; font-size: 12px;" data-prompt="Retro neon Snake game with collectible fruit, speed boosts, glowing trail, and score" data-category="arcade">
+                🐍 Cyber Snake
+              </button>
+              <button class="chip btn-secondary" style="height: auto; padding: 8px 10px; justify-content: flex-start; text-align: left; font-size: 12px;" data-prompt="Brick breaker breakout game with bouncing ball, colorful destructible blocks, and multiball" data-category="arcade">
+                🧱 Brick Breaker
+              </button>
+              <button class="chip btn-secondary" style="height: auto; padding: 8px 10px; justify-content: flex-start; text-align: left; font-size: 12px;" data-prompt="Flappy neon drone flying through electric obstacles with space/click controls and score" data-category="platformer">
+                ⚡ Aero Drone
+              </button>
+            </div>
+          </div>
+
+          <!-- Streaming Telemetry Console -->
+          <pre id="stream-panel" class="code-text" style="display: none; height: 110px; overflow-y: auto; background-color: var(--color-canvas); border: 1px solid var(--color-hairline); border-radius: var(--radius-md); padding: 8px; font-size: 11px; color: var(--color-body); margin-top: auto;"></pre>
+        </div>
+
+        <!-- Workbench Right Pane: Live Viewport -->
+        <div class="studio-viewport">
+          <div class="viewport-toolbar">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-success);"></span>
+              <span id="workbench-title-label" style="font-weight: 600; color: #ffffff;">Live Viewport: Neon Space Defender</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button id="wb-restart-btn" class="btn-icon-circular" style="background: #222; border-color: #333; color: #fff; width: 30px; height: 30px; font-size: 12px;" title="Restart Game">
+                🔄
+              </button>
+              <button id="wb-fullscreen-btn" class="btn-icon-circular" style="background: #222; border-color: #333; color: #fff; width: 30px; height: 30px; font-size: 12px;" title="Fullscreen">
+                ⛶
+              </button>
+            </div>
+          </div>
+          <iframe
+            id="workbench-frame"
+            class="viewport-frame"
+            src="/api/games/archetype/shooter"
+            sandbox="allow-scripts allow-same-origin allow-pointer-lock"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<!-- AI Image & Asset Studio -->
-<section class="generator-box" style="margin-bottom: 36px; background: linear-gradient(180deg, #182236 0%, #111827 100%); border-color: #3b5074;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-    <h2 style="font-size: 22px; font-weight: 700; color: #38bdf8;">🎨 AI Sprite & Asset Generator (Gemini Image Gen)</h2>
-    <span class="chip-label" style="color: var(--accent);">✨ Text-to-Image / Imagen</span>
-  </div>
-  <p class="generator-subtitle" style="margin-bottom: 16px;">Create pixel-art sprites, game backgrounds, and arcade icons to drop straight into your games.</p>
-
-  <div class="input-row">
-    <input
-      type="text"
-      id="image-prompt-input"
-      class="input-prompt"
-      placeholder="e.g. Glowing neon spaceship fighter sprite, isolated on black..."
-      autocomplete="off"
-    />
-    <select id="image-style-select" class="select-category">
-      <option value="pixel-art">16-Bit Pixel Art</option>
-      <option value="retro-arcade">Retro Arcade Graphic</option>
-      <option value="scifi-background">Game Background Scene</option>
-    </select>
-    <button id="generate-image-btn" class="btn-generate" style="background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white;">
-      <span>🎨 Generate Image</span>
-    </button>
-  </div>
-
-  <div id="image-result-box" style="display: none; margin-top: 16px; padding: 16px; background: #0b1120; border-radius: 12px; border: 1px solid var(--border); align-items: center; gap: 20px;">
-    <img id="image-result-thumb" src="" alt="Generated Asset" style="width: 120px; height: 120px; object-fit: contain; background: #000; border-radius: 8px; border: 1px solid var(--border);" />
-    <div style="flex: 1;">
-      <h4 id="image-result-title" style="font-size: 15px; margin-bottom: 4px;">Asset Created</h4>
-      <p id="image-result-desc" style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;"></p>
-      <div style="display: flex; gap: 10px;">
-        <button id="copy-data-url-btn" class="btn-card btn-refine" style="padding: 6px 14px; font-size: 13px;">📋 Copy Data URL</button>
-        <a id="download-asset-link" href="" download class="btn-card btn-play" style="padding: 6px 14px; font-size: 13px; text-decoration: none;">⬇ Download PNG</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Gallery Section -->
-<section>
-  <div class="gallery-header">
-    <div>
-      <h2 class="gallery-title">Your Game Library</h2>
-      <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
-        Click <strong>Play</strong> to play in your browser, or <strong>Refine</strong> to ask the AI for changes.
+<!-- 3. Alternating Section: Surface Soft (#f8f9fa) - Engine Architecture & Tactile Features -->
+<section class="section surface-soft">
+  <div class="container">
+    <div style="margin-bottom: 48px; max-width: 640px;">
+      <div class="badge-pill" style="margin-bottom: 12px;">Architecture</div>
+      <h2 class="display-sm" style="margin-bottom: 12px;">
+        Engineered for instant response and tactile polish.
+      </h2>
+      <p class="body-md" style="color: var(--color-muted);">
+        Every game synthesized by 8Gen includes three foundational, zero-dependency modules built directly into the single-file canvas payload.
       </p>
     </div>
-    <span id="game-count" class="chip-label">0 Games</span>
-  </div>
 
-  <div id="games-grid" class="games-grid">
-    <div class="empty-state" style="grid-column: 1 / -1;">Loading library...</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+      <!-- Feature Card 1 -->
+      <div class="feature-card">
+        <div style="width: 40px; height: 40px; border-radius: 8px; background-color: var(--color-canvas); border: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px;">
+          🎮
+        </div>
+        <h3 class="title-md" style="margin-bottom: 10px;">Zero-Dependency Canvas Core</h3>
+        <p class="body-sm" style="line-height: 1.6;">
+          Pure 60fps HTML5 Canvas 2D rendering loop. Features delta-time step calculations, cross-platform input management (Arrow keys, WASD, Mouse, and Mobile Touch), and default scroll interception.
+        </p>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div class="feature-card">
+        <div style="width: 40px; height: 40px; border-radius: 8px; background-color: var(--color-canvas); border: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px;">
+          🔊
+        </div>
+        <h3 class="title-md" style="margin-bottom: 10px;">Procedural Web Audio API</h3>
+        <p class="body-sm" style="line-height: 1.6;">
+          Zero external audio files required. Real-time mathematical synthesis creates downward laser sweeps, white-noise explosion bursts, punchy thud impacts, and ascending arpeggios on demand.
+        </p>
+      </div>
+
+      <!-- Feature Card 3 -->
+      <div class="feature-card">
+        <div style="width: 40px; height: 40px; border-radius: 8px; background-color: var(--color-canvas); border: 1px solid var(--color-hairline); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 20px;">
+          ✨
+        </div>
+        <h3 class="title-md" style="margin-bottom: 10px;">Particle Engine & Self-Healing</h3>
+        <p class="body-sm" style="line-height: 1.6;">
+          Every impact triggers colorful fading particle bursts, floating score text, and authentic camera shake. An AST validation engine repairs broken loops and guarantees 100% playable output.
+        </p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Play Game Modal -->
-<div id="game-modal" class="modal-overlay">
-  <div class="modal-content">
-    <div class="modal-header">
-      <div class="modal-title">
-        <span>🎮</span>
-        <span id="modal-game-title">Play Game</span>
+<!-- 4. Section: White Canvas (#ffffff) - Guaranteed Playable Archetypes -->
+<section id="archetypes" class="section">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div class="badge-pill" style="margin-bottom: 12px;">Zero Latency</div>
+        <h2 class="display-sm" style="margin-bottom: 10px;">Guaranteed Playable Archetypes</h2>
+        <p class="body-sm" style="max-width: 600px;">
+          Ready-to-run arcade archetypes engineered with full mechanics, particle systems, procedural audio, and high score tracking.
+        </p>
       </div>
-      <div class="modal-controls">
-        <span style="font-size: 12px; color: var(--text-muted); margin-right: 12px;">
-          Controls: Arrow keys / WASD / Space / Mouse
-        </span>
-        <button id="fullscreen-btn" class="btn-icon" title="Fullscreen">⛶</button>
-        <button id="modal-close" class="btn-icon" title="Close">✕</button>
+      <a href="#workbench" class="btn-secondary">Load Into Studio Workbench</a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+      <!-- Archetype 1: Space Shooter -->
+      <div class="product-mockup-card" style="padding: 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
+        <h3 class="title-md" style="margin-bottom: 8px;">Space Defender</h3>
+        <p class="body-sm" style="flex: 1; margin-bottom: 20px;">
+          Dual laser cannons, alien attack waves, powerup drops (weapon boost & shield), particle thrusters, and boss encounters.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" style="flex: 1; height: 36px; font-size: 13px;" onclick="loadArchetypeIntoWorkbench('shooter', 'Neon Space Defender')">
+            ▶ Play Now
+          </button>
+          <a href="/api/games/archetype/shooter" target="_blank" class="btn-secondary" style="height: 36px; font-size: 13px;">
+            ↗ Open
+          </a>
+        </div>
+      </div>
+
+      <!-- Archetype 2: Cyber Snake -->
+      <div class="product-mockup-card" style="padding: 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 32px; margin-bottom: 12px;">🐍</div>
+        <h3 class="title-md" style="margin-bottom: 8px;">Cyber Snake 2099</h3>
+        <p class="body-sm" style="flex: 1; margin-bottom: 20px;">
+          Grid-aligned snake movement with speed interpolation, golden fruit bonuses, glowing trail particles, and high score records.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" style="flex: 1; height: 36px; font-size: 13px;" onclick="loadArchetypeIntoWorkbench('snake', 'Cyber Snake 2099')">
+            ▶ Play Now
+          </button>
+          <a href="/api/games/archetype/snake" target="_blank" class="btn-secondary" style="height: 36px; font-size: 13px;">
+            ↗ Open
+          </a>
+        </div>
+      </div>
+
+      <!-- Archetype 3: Brick Breaker -->
+      <div class="product-mockup-card" style="padding: 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 32px; margin-bottom: 12px;">🧱</div>
+        <h3 class="title-md" style="margin-bottom: 8px;">Quantum Breakout</h3>
+        <p class="body-sm" style="flex: 1; margin-bottom: 20px;">
+          Angular paddle deflection, multi-hit destructible bricks, ball particle trails, and lives counter with sound synthesis.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" style="flex: 1; height: 36px; font-size: 13px;" onclick="loadArchetypeIntoWorkbench('brick', 'Quantum Breakout')">
+            ▶ Play Now
+          </button>
+          <a href="/api/games/archetype/brick" target="_blank" class="btn-secondary" style="height: 36px; font-size: 13px;">
+            ↗ Open
+          </a>
+        </div>
+      </div>
+
+      <!-- Archetype 4: Aero Drone -->
+      <div class="product-mockup-card" style="padding: 24px; display: flex; flex-direction: column;">
+        <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
+        <h3 class="title-md" style="margin-bottom: 8px;">Aero Drone Odyssey</h3>
+        <p class="body-sm" style="flex: 1; margin-bottom: 20px;">
+          One-button tap/space gravity flight mechanics, moving neon obstacle pillars, bonus energy orbs, and screen shake on crash.
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn-primary" style="flex: 1; height: 36px; font-size: 13px;" onclick="loadArchetypeIntoWorkbench('drone', 'Aero Drone Odyssey')">
+            ▶ Play Now
+          </button>
+          <a href="/api/games/archetype/drone" target="_blank" class="btn-secondary" style="height: 36px; font-size: 13px;">
+            ↗ Open
+          </a>
+        </div>
       </div>
     </div>
-    <iframe id="game-frame" class="game-iframe" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
+  </div>
+</section>
+
+<!-- 5. Alternating Section: Surface Soft (#f8f9fa) - AI Asset & Sprite Generator -->
+<section id="assets" class="section surface-soft">
+  <div class="container">
+    <div style="margin-bottom: 32px; max-width: 640px;">
+      <div class="badge-pill" style="margin-bottom: 12px;">Image Generation</div>
+      <h2 class="display-sm" style="margin-bottom: 10px;">Autonomous AI Asset Studio</h2>
+      <p class="body-sm">
+        Synthesize pixel art sprites, retro character icons, and background scenes using Google Imagen 3 or local Gemini Web-to-API.
+      </p>
+    </div>
+
+    <div class="product-mockup-card" style="padding: 32px;">
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+        <input
+          type="text"
+          id="image-prompt-input"
+          class="text-input"
+          style="flex: 1; min-width: 280px;"
+          placeholder="e.g. Glowing neon spaceship fighter sprite, isolated on black background..."
+        />
+        <select id="image-style-select" class="select-input">
+          <option value="pixel-art">16-Bit Pixel Art</option>
+          <option value="retro-arcade">Retro Arcade Graphic</option>
+          <option value="scifi-background">Game Background Scene</option>
+        </select>
+        <button id="generate-image-btn" class="btn-primary" style="white-space: nowrap;">
+          🎨 Synthesize Asset
+        </button>
+      </div>
+
+      <!-- Result Box -->
+      <div id="image-result-box" style="display: none; align-items: center; gap: 24px; padding: 20px; background-color: var(--color-surface-soft); border-radius: var(--radius-lg); border: 1px solid var(--color-hairline);">
+        <img id="image-result-thumb" src="" alt="Generated Asset" style="width: 110px; height: 110px; object-fit: contain; background: #000000; border-radius: var(--radius-md); border: 1px solid var(--color-hairline);" />
+        <div style="flex: 1;">
+          <h4 id="image-result-title" class="title-sm" style="margin-bottom: 4px;">Asset Synthesized</h4>
+          <p id="image-result-desc" class="body-sm" style="margin-bottom: 12px;"></p>
+          <div style="display: flex; gap: 10px;">
+            <button id="copy-data-url-btn" class="btn-secondary" style="height: 36px; padding: 0 14px; font-size: 13px;">
+              📋 Copy Data URL
+            </button>
+            <a id="download-asset-link" href="" download class="btn-primary" style="height: 36px; padding: 0 14px; font-size: 13px;">
+              ⬇ Download PNG
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. Section: White Canvas (#ffffff) - Local Game Library & Storage -->
+<section id="library" class="section">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div class="badge-pill" style="margin-bottom: 12px;">Local Storage</div>
+        <h2 class="display-sm" style="margin-bottom: 6px;">Local Game Repository</h2>
+        <p class="body-sm">
+          All generated games saved locally in SQLite and ready for zero-dependency standalone export.
+        </p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span id="game-count" class="badge-pill" style="font-weight: 600;">0 Games</span>
+        <button id="refresh-games-btn" class="btn-secondary" style="height: 36px; padding: 0 14px; font-size: 13px;">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <div id="games-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;">
+      <div class="product-mockup-card" style="grid-column: 1 / -1; text-align: center; padding: 48px;">
+        <p class="body-sm">Loading local library...</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Game Player Modal for Fullscreen Focus -->
+<div id="game-modal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); z-index: 1000; align-items: center; justify-content: center; padding: 24px;">
+  <div class="hero-product-card" style="width: 100%; max-width: 960px; height: 85vh; display: flex; flex-direction: column; background: #0a0a0a;">
+    <div class="viewport-toolbar" style="border-top-left-radius: var(--radius-xl); border-top-right-radius: var(--radius-xl);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-success);"></span>
+        <span id="modal-game-title" style="font-weight: 600; color: #ffffff;">Play Game</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button id="fullscreen-btn" class="btn-icon-circular" style="background: #222; border-color: #333; color: #fff; width: 30px; height: 30px; font-size: 12px;" title="Fullscreen">
+          ⛶
+        </button>
+        <button id="modal-close" class="btn-icon-circular" style="background: #222; border-color: #333; color: #fff; width: 30px; height: 30px; font-size: 12px;" title="Close">
+          ✕
+        </button>
+      </div>
+    </div>
+    <iframe id="game-frame" class="viewport-frame" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
   </div>
 </div>
 {% endblock %}
