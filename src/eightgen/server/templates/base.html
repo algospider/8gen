@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}8Gen — AI Instant Game Studio{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="header">
+    <div class="logo-container">
+      <div class="logo-badge">8Gen</div>
+      <div class="logo-title">Instant Game Studio</div>
+    </div>
+    <div class="model-pill">
+      <span class="pulse-dot"></span>
+      <span>Model: {{ model_name }}</span>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="/static/js/dashboard.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

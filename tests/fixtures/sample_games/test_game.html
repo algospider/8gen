@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sample Game</title>
+</head>
+<body>
+  <canvas id="c" width="400" height="400"></canvas>
+  <script>
+    const c = document.getElementById('c');
+    const ctx = c.getContext('2d');
+    function draw() {
+      ctx.fillStyle = '#0f0';
+      ctx.fillRect(0, 0, 400, 400);
+      requestAnimationFrame(draw);
+    }
+    draw();
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+[llm]
+provider = "ollama"
+ollama_url = "http://localhost:11434"
+model = "huihui_ai/qwen2.5-coder-abliterate:7b"
+temperature = 0.7
+timeout = 180.0
+max_retries = 3
+
+[storage]
+output_dir = "./games"
+db_path = "./games/8gen.db"
+
+[server]
+host = "127.0.0.1"
+port = 8000
+auto_open = true
+
+[ui]
+theme = "dark"
+stream_output = true

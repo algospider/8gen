@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Beginner Guide Banner -->
+<div class="beginner-banner">
+  <div class="beginner-step">
+    <div class="step-badge">1</div>
+    <div class="step-text">
+      <strong>Pick an Idea</strong>
+      <span>Click any preset below or type what you imagine</span>
+    </div>
+  </div>
+  <div class="step-divider">→</div>
+  <div class="beginner-step">
+    <div class="step-badge">2</div>
+    <div class="step-text">
+      <strong>Instant AI Build</strong>
+      <span>Your local Ollama writes the full HTML5 game</span>
+    </div>
+  </div>
+  <div class="step-divider">→</div>
+  <div class="beginner-step">
+    <div class="step-badge">3</div>
+    <div class="step-text">
+      <strong>Play Instantly</strong>
+      <span>Runs in your browser with zero downloads</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main Generator Section -->
+<section class="generator-box">
+  <h1 class="generator-title">Instant Game Studio</h1>
+  <p class="generator-subtitle">Type any game idea in simple words. 8Gen will synthesize and launch it locally on your computer.</p>
+
+  <div class="input-row">
+    <input
+      type="text"
+      id="prompt-input"
+      class="input-prompt"
+      placeholder="e.g. Neon space shooter with laser cannons, aliens, and sound effects..."
+      autocomplete="off"
+    />
+    <select id="category-select" class="select-category">
+      <option value="arcade">Arcade</option>
+      <option value="shooter">Shooter</option>
+      <option value="platformer">Platformer</option>
+      <option value="puzzle">Puzzle</option>
+      <option value="action">Action</option>
+    </select>
+    <button id="generate-btn" class="btn-generate">
+      <span>✨ Generate Game</span>
+    </button>
+  </div>
+
+  <!-- Popular Presets -->
+  <div style="margin-top: 20px;">
+    <div style="font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 10px;">
+      🎮 Popular Starter Games (Click to autofill):
+    </div>
+    <div class="preset-cards-grid">
+      <div class="preset-card chip" data-prompt="Retro Space Invaders with laser cannons, enemy formations, sound effects, and high score" data-category="shooter">
+        <span class="preset-icon">🚀</span>
+        <div class="preset-info">
+          <strong>Space Invaders</strong>
+          <span>Laser cannons & alien waves</span>
+        </div>
+      </div>
+      <div class="preset-card chip" data-prompt="Retro neon Snake game with collectible fruit, speed boosts, glowing trail, and score" data-category="arcade">
+        <span class="preset-icon">🐍</span>
+        <div class="preset-info">
+          <strong>Cyber Snake</strong>
+          <span>Glow trail & fruit bonuses</span>
+        </div>
+      </div>
+      <div class="preset-card chip" data-prompt="Brick breaker breakout game with bouncing ball, colorful destructible blocks, and multiball" data-category="arcade">
+        <span class="preset-icon">🧱</span>
+        <div class="preset-info">
+          <strong>Brick Breaker</strong>
+          <span>Destructible blocks & powerups</span>
+        </div>
+      </div>
+      <div class="preset-card chip" data-prompt="Flappy neon drone flying through electric obstacles with space/click controls and score" data-category="arcade">
+        <span class="preset-icon">⚡</span>
+        <div class="preset-info">
+          <strong>Flappy Drone</strong>
+          <span>Tap/Space to fly through gates</span>
+        </div>
+      </div>
+      <div class="preset-card chip" data-prompt="Retro Pong game with AI opponent, ball acceleration, sound effects, and score to 5" data-category="arcade">
+        <span class="preset-icon">🏓</span>
+        <div class="preset-info">
+          <strong>Retro Pong</strong>
+          <span>Paddle bounce vs smart AI</span>
+        </div>
+      </div>
+      <div class="preset-card chip" data-prompt="Match 3 colorful jewel puzzle game with mouse clicking and explosive combos" data-category="puzzle">
+        <span class="preset-icon">💎</span>
+        <div class="preset-info">
+          <strong>Gem Matcher</strong>
+          <span>3-in-a-row puzzle combos</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <pre id="stream-panel" class="stream-panel"></pre>
+</section>
+
+<!-- Gallery Section -->
+<section>
+  <div class="gallery-header">
+    <div>
+      <h2 class="gallery-title">Your Game Library</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+        Click <strong>Play</strong> to play in your browser, or <strong>Refine</strong> to ask the AI for changes.
+      </p>
+    </div>
+    <span id="game-count" class="chip-label">0 Games</span>
+  </div>
+
+  <div id="games-grid" class="games-grid">
+    <div class="empty-state" style="grid-column: 1 / -1;">Loading library...</div>
+  </div>
+</section>
+
+<!-- Play Game Modal -->
+<div id="game-modal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span>🎮</span>
+        <span id="modal-game-title">Play Game</span>
+      </div>
+      <div class="modal-controls">
+        <span style="font-size: 12px; color: var(--text-muted); margin-right: 12px;">
+          Controls: Arrow keys / WASD / Space / Mouse
+        </span>
+        <button id="fullscreen-btn" class="btn-icon" title="Fullscreen">⛶</button>
+        <button id="modal-close" class="btn-icon" title="Close">✕</button>
+      </div>
+    </div>
+    <iframe id="game-frame" class="game-iframe" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
+  </div>
+</div>
+{% endblock %}

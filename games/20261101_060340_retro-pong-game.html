@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Pong Game</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #000;
+        }
+        canvas {
+            border: 1px solid #fff;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pongCanvas" width="800" height="600"></canvas>
+    <div class="stars"></div>
+    <script>
+        const canvas = document.getElementById('pongCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const ballRadius = 10;
+        const initialSpeed = 5;
+
+        let player1Y = (canvas.height - paddleHeight) / 2;
+        let player2Y = (canvas.height - paddleHeight) / 2;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballDX = initialSpeed;
+        let ballDY = initialSpeed;
+        let speedMultiplier = 1;
+        let score1 = 0;
+        let score2 = 0;
+        let isGameOver = false;
+
+        function drawPaddle(x, y) {
+            ctx.fillStyle = '#0f0';
+            ctx.fillRect(x, y, paddleWidth, paddleHeight);
+        }
+
+        function drawBall() {
+            ctx.fillStyle = '#ff0';
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawScore() {
+            ctx.fillStyle = '#fff';
+            ctx.font = '30px Arial';
+            ctx.fillText(score1, canvas.width / 4, 50);
+            ctx.fillText(score2, 3 * canvas.width / 4, 50);
+        }
+
+        function drawStars() {
+            ctx.fillStyle = '#000';
+            for (let i = 0; i < 100; i++) {
+                ctx.beginPath();
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawStars();
+            drawPaddle(0, player1Y);
+            drawPaddle(canvas.width - paddleWidth, player2Y);
+            drawBall();
+            drawScore();
+        }
+
+        function update() {
+            if (!isGameOver) {
+                ballX += ballDX;
+                ballY += ballDY;
+
+                if (ballY + ballRadius > canvas.height || ballY - ballRadius < 0) {
+                    ballDY = -ballDY;
+                }
+
+                if (ballX - ballRadius < 0) {
+                    score2++;
+                    resetBall();
+                } else if (ballX + ballRadius > canvas.width) {
+                    score1++;
+                    resetBall();
+                }
+
+                if (ballX - ballRadius < paddleWidth && ballY > player1Y && ballY < player1Y + paddleHeight) {
+                    ballDX = -ballDX * (speedMultiplier + 1);
+                    ballDY = ballDY * (speedMultiplier + 1);
+                    speedMultiplier += 0.1;
+                } else if (ballX + ballRadius > canvas.width - paddleWidth && ballY > player2Y && ballY < player2Y + paddleHeight) {
+                    ballDX = -ballDX * (speedMultiplier + 1);
+                    ballDY = ballDY * (speedMultiplier + 1);
+                    speedMultiplier += 0.1;
+                }
+
+                if (score1 === 5 || score2 === 5) {
+                    isGameOver = true;
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '50px Arial';
+                    ctx.fillText(score1 === 5 ? 'Player 1 Wins!' : 'Player 2 Wins!', canvas.width / 2 - 150, canvas.height / 2);
+                }
+            }
+        }
+
+        function resetBall() {
+            ballX = canvas.width / 2;
+            ballY = canvas.height / 2;
+            ballDX = initialSpeed * (Math.random() > 0.5 ? 1 : -1);
+            ballDY = initialSpeed * (Math.random() > 0.5 ? 1 : -1);
+            speedMultiplier = 1;
+        }
+
+        function movePaddle(event) {
+            const rect = canvas.getBoundingClientRect();
+            const y = event.clientY - rect.top - paddleHeight / 2;
+
+            if (event.type === 'touchstart' || event.type === 'touchmove') {
+                const touch = event.touches[0];
+                y = touch.clientY - rect.top - paddleHeight / 2;
+            }
+
+            if (y >= 0 && y <= canvas.height - paddleHeight) {
+                player1Y = y;
+            }
+        }
+
+        canvas.addEventListener('mousemove', movePaddle);
+        canvas.addEventListener('touchmove', movePaddle);
+        canvas.addEventListener('click', () => {
+            if (isGameOver) {
+                score1 = 0;
+                score2 = 0;
+                isGameOver = false;
+                resetBall();
+            }
+        });
+
+        function gameLoop() {
+            draw();
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

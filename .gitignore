@@ -1,0 +1,24 @@
+# Virtual Environments
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment Variables & Local configs
+.env
+8gen.toml
+
+# macOS
+.DS_Store
